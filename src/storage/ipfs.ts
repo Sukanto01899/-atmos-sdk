@@ -17,6 +17,9 @@ export interface IpfsAdapterOptions {
   headers?: Record<string, string>;
   pin?: boolean;
   timeoutMs?: number;
+  cidVersion?: 0 | 1;
+  cidBase?: string;
+  mfsRoot?: string;
 }
 
 const withTimeout = async <T>(promise: Promise<T>, timeoutMs?: number) => {
@@ -46,6 +49,37 @@ const toBlob = async (
   if (data instanceof ArrayBuffer) return new Blob([data]);
   const buffer = await new Response(data).arrayBuffer();
   return new Blob([buffer]);
+};
+
+const readStreamChunks = async (
+  stream: ReadableStream<Uint8Array>,
+  chunkSize: number,
+  onChunk: (chunk: Uint8Array) => Promise<void>,
+) => {
+  const reader = stream.getReader();
+  let buffered = new Uint8Array(0);
+  try {
+    while (true) {
+      const result = await reader.read();
+      if (result.done) break;
+      const next = new Uint8Array(buffered.length + result.value.length);
+      next.set(buffered);
+      next.set(result.value, buffered.length);
+      buffered = next;
+
+      while (buffered.length >= chunkSize) {
+        const chunk = buffered.slice(0, chunkSize);
+        buffered = buffered.slice(chunkSize);
+        await onChunk(chunk);
+      }
+    }
+
+    if (buffered.length > 0) {
+      await onChunk(buffered);
+    }
+  } finally {
+    reader.releaseLock();
+  }
 };
 
 const fetchJson = async <T>(
@@ -86,18 +120,134 @@ const sha256Hex = async (data: ArrayBuffer) => {
 export const createIpfsAdapter = (options: IpfsAdapterOptions): StorageAdapter => {
   const endpoint = ensureEndpoint(options.endpoint);
   const headers = options.headers ?? {};
+  const cidVersion = options.cidVersion ?? 0;
+  const cidBase = options.cidBase ?? (cidVersion === 1 ? "base32" : "base58btc");
+  const mfsRoot = options.mfsRoot ?? "/atmos";
+  const defaultChunkSize = 5 * 1024 * 1024;
+
+  const writeMfsChunk = async (
+    path: string,
+    chunk: Uint8Array,
+    offset: number,
+    signal?: AbortSignal,
+  ) => {
+    const form = new FormData();
+    form.append("file", new Blob([chunk]));
+    const url = new URL(`${endpoint}/api/v0/files/write`);
+    url.searchParams.set("arg", path);
+    url.searchParams.set("offset", String(offset));
+    url.searchParams.set("create", "true");
+    url.searchParams.set("truncate", "false");
+    url.searchParams.set("parents", "true");
+
+    const response = await withTimeout(
+      fetch(url.toString(), {
+        method: "POST",
+        headers,
+        body: form,
+        signal,
+      }),
+      options.timeoutMs,
+    );
+    if (!response.ok) {
+      const text = await response.text();
+      throw new SdkError("E_IPFS", `MFS write failed: ${text}`, response.status);
+    }
+  };
+
+  const statMfs = async (path: string) =>
+    fetchJson<{ Hash: string; Size: number }>(
+      `${endpoint}/api/v0/files/stat?arg=${encodeURIComponent(path)}&hash=true&size=true`,
+      { method: "POST", headers },
+      options.timeoutMs,
+    );
+
+  const formatCid = async (cid: string) => {
+    if (cidVersion !== 1) return cid;
+    const url = `${endpoint}/api/v0/cid/format?arg=${cid}&v=1&b=${cidBase}`;
+    try {
+      const formatted = await fetchJson<{ String: string }>(
+        url,
+        { method: "POST", headers },
+        options.timeoutMs,
+      );
+      return formatted.String ?? cid;
+    } catch {
+      return cid;
+    }
+  };
 
   return {
     async upload(
       data: Blob | ArrayBuffer | ReadableStream<Uint8Array>,
       uploadOptions: UploadOptions,
     ): Promise<UploadResult> {
+      const chunkSize = uploadOptions.chunkSize ?? defaultChunkSize;
+
+      if (uploadOptions.resumable) {
+        const sessionId =
+          uploadOptions.sessionId ??
+          `${uploadOptions.metadata.name.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}`;
+        const path = `${mfsRoot}/${sessionId}`;
+
+        let offset = 0;
+        try {
+          const stat = await statMfs(path);
+          offset = stat.Size;
+        } catch {
+          offset = 0;
+        }
+
+        let uploadedBytes = offset;
+        const reportProgress = () => {
+          if (uploadOptions.onProgress) {
+            const totalBytes =
+              uploadOptions.contentLength ?? (data instanceof Blob ? data.size : undefined);
+            const percent =
+              totalBytes && totalBytes > 0
+                ? Math.min(100, Math.round((uploadedBytes / totalBytes) * 100))
+                : undefined;
+            uploadOptions.onProgress({ uploadedBytes, totalBytes, percent });
+          }
+        };
+
+        if (data instanceof Blob || data instanceof ArrayBuffer) {
+          const blob = data instanceof Blob ? data : new Blob([data]);
+          for (let start = offset; start < blob.size; start += chunkSize) {
+            const chunk = await blob.slice(start, start + chunkSize).arrayBuffer();
+            await writeMfsChunk(path, new Uint8Array(chunk), start, uploadOptions.abortSignal);
+            uploadedBytes = Math.min(blob.size, start + chunk.byteLength);
+            reportProgress();
+          }
+        } else {
+          await readStreamChunks(data, chunkSize, async (chunk) => {
+            await writeMfsChunk(path, chunk, uploadedBytes, uploadOptions.abortSignal);
+            uploadedBytes += chunk.byteLength;
+            reportProgress();
+          });
+        }
+
+        const stat = await statMfs(path);
+        const cid = await formatCid(stat.Hash);
+        return {
+          id: cid,
+          location: `ipfs://${cid}`,
+          checksum: uploadOptions.checksum,
+          sessionId,
+        };
+      }
+
       const blob = await toBlob(data);
       const form = new FormData();
       form.append("file", blob, uploadOptions.metadata.name || "dataset");
 
       const url = new URL(`${endpoint}/api/v0/add`);
       url.searchParams.set("pin", String(options.pin ?? true));
+      url.searchParams.set("cid-version", String(cidVersion));
+      if (cidVersion === 1) {
+        url.searchParams.set("cid-base", cidBase);
+        url.searchParams.set("raw-leaves", "true");
+      }
       if (uploadOptions.chunkSize) {
         url.searchParams.set("chunker", `size-${uploadOptions.chunkSize}`);
       }

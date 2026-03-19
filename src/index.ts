@@ -21,6 +21,7 @@ export type {
 } from "./types";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
+export type { IpfsAdapterOptions } from "./storage/ipfs";
 export { createS3Adapter } from "./storage/s3";
 export { httpTransport } from "./transport/http";
 export { withRetry } from "./utils/retry";

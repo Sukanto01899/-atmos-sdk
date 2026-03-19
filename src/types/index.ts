@@ -30,6 +30,7 @@ export interface UploadOptions {
   onProgress?: (progress: UploadProgress) => void;
   abortSignal?: AbortSignal;
   resumable?: boolean;
+  sessionId?: string;
 }
 
 export interface UploadProgress {
@@ -44,6 +45,7 @@ export interface UploadResult {
   id: DatasetId;
   location: string; // ipfs://, s3://, https://
   checksum?: string;
+  sessionId?: string;
 }
 
 export interface DownloadOptions {
