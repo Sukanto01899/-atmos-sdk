@@ -1,5 +1,6 @@
 import { SdkError } from "../types";
 import type { BatchOptions, BatchResult, BatchProgress } from "../types";
+import { withRetry } from "./retry";
 
 const DEFAULT_CONCURRENCY = 3;
 
@@ -41,7 +42,11 @@ export const runBatch = async <TItem, TResult>(
       inFlight += 1;
       report();
       try {
-        const result = await worker(item, index);
+        const execute = () => worker(item, index);
+        const result =
+          options?.retries && options.retries > 0
+            ? await withRetry(execute, options.retries, options.retryDelayMs)
+            : await execute();
         results[index] = { item, status: "fulfilled", result };
         succeeded += 1;
       } catch (error) {

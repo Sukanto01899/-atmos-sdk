@@ -73,6 +73,8 @@ const batch = await client.uploadBatch(
   ],
   {
     concurrency: 3,
+    retries: 2,
+    retryDelayMs: 400,
     stopOnError: false,
     onProgress: (progress) => console.log(progress),
   },

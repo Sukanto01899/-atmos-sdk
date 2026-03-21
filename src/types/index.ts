@@ -51,6 +51,8 @@ export interface UploadResult {
 export interface BatchOptions {
   concurrency?: number;
   stopOnError?: boolean;
+  retries?: number;
+  retryDelayMs?: number;
   onProgress?: (progress: BatchProgress) => void;
 }
 
