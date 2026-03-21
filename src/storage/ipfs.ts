@@ -132,7 +132,9 @@ export const createIpfsAdapter = (options: IpfsAdapterOptions): StorageAdapter =
     signal?: AbortSignal,
   ) => {
     const form = new FormData();
-    form.append("file", new Blob([chunk]));
+    const safeChunk = new Uint8Array(chunk.length);
+    safeChunk.set(chunk);
+    form.append("file", new Blob([safeChunk]));
     const url = new URL(`${endpoint}/api/v0/files/write`);
     url.searchParams.set("arg", path);
     url.searchParams.set("offset", String(offset));

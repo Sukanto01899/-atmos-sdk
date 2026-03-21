@@ -2,7 +2,15 @@ import type { SdkClientOptions, Transport } from "../types";
 import { SdkError } from "../types";
 
 export const httpTransport = (options: SdkClientOptions): Transport => ({
-  async request<T>(method, path, req) {
+  async request<T>(
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    path: string,
+    req?: {
+      headers?: Record<string, string>;
+      body?: unknown;
+      signal?: AbortSignal;
+    },
+  ) {
     const url = `${options.baseUrl}${path}`;
     const headers: Record<string, string> = {
       "content-type": "application/json",
