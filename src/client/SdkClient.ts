@@ -1,8 +1,11 @@
 import type {
+  BatchOptions,
+  BatchResult,
   DatasetId,
   DatasetMetadata,
   DownloadOptions,
   DownloadResult,
+  DownloadBatchItem,
   ListDatasetsOptions,
   ListDatasetsResult,
   PreviewOptions,
@@ -11,11 +14,13 @@ import type {
   StorageAdapter,
   UploadOptions,
   UploadResult,
+  UploadBatchItem,
   VerifyOptions,
   VerifyResult,
 } from "../types";
 import { httpTransport } from "../transport/http";
 import { SdkError } from "../types";
+import { runBatch } from "../utils/batch";
 
 export class SdkClient {
   private readonly baseUrl: string;
@@ -38,11 +43,31 @@ export class SdkClient {
     return this.storage.upload(data, options);
   }
 
+  async uploadBatch(
+    items: UploadBatchItem[],
+    options?: BatchOptions,
+  ): Promise<BatchResult<UploadBatchItem, UploadResult>[]> {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    return runBatch(items, (item) => this.storage!.upload(item.data, item.options), options);
+  }
+
   async download(id: DatasetId, options?: DownloadOptions): Promise<DownloadResult> {
     if (!this.storage) {
       throw new SdkError("E_STORAGE", "No storage adapter configured.");
     }
     return this.storage.download(id, options);
+  }
+
+  async downloadBatch(
+    items: DownloadBatchItem[],
+    options?: BatchOptions,
+  ): Promise<BatchResult<DownloadBatchItem, DownloadResult>[]> {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    return runBatch(items, (item) => this.storage!.download(item.id, item.options), options);
   }
 
   async preview(id: DatasetId, options?: PreviewOptions): Promise<PreviewResult> {

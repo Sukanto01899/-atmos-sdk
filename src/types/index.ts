@@ -48,6 +48,34 @@ export interface UploadResult {
   sessionId?: string;
 }
 
+export interface BatchOptions {
+  concurrency?: number;
+  stopOnError?: boolean;
+  onProgress?: (progress: BatchProgress) => void;
+}
+
+export interface BatchProgress {
+  total: number;
+  completed: number;
+  succeeded: number;
+  failed: number;
+  inFlight: number;
+}
+
+export type BatchResult<TItem, TResult> =
+  | { item: TItem; status: "fulfilled"; result: TResult }
+  | { item: TItem; status: "rejected"; error: unknown };
+
+export interface UploadBatchItem {
+  data: Blob | ArrayBuffer | ReadableStream<Uint8Array>;
+  options: UploadOptions;
+}
+
+export interface DownloadBatchItem {
+  id: DatasetId;
+  options?: DownloadOptions;
+}
+
 export interface DownloadOptions {
   range?: { start: number; end?: number };
   asStream?: boolean;

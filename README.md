@@ -63,6 +63,25 @@ const result = await client.upload(file, {
 });
 ```
 
+### Batch upload
+
+```ts
+const batch = await client.uploadBatch(
+  [
+    { data: fileA, options: { metadata: metaA } },
+    { data: fileB, options: { metadata: metaB } },
+  ],
+  {
+    concurrency: 3,
+    stopOnError: false,
+    onProgress: (progress) => console.log(progress),
+  },
+);
+
+const successes = batch.filter((item) => item.status === "fulfilled");
+const failures = batch.filter((item) => item.status === "rejected");
+```
+
 ### Download
 
 ```ts
@@ -85,6 +104,15 @@ if (stream) {
     console.log(value.byteLength);
   }
 }
+```
+
+### Batch download
+
+```ts
+const results = await client.downloadBatch(
+  [{ id: "QmA" }, { id: "QmB" }],
+  { concurrency: 4 },
+);
 ```
 
 ### Preview

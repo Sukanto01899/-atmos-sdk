@@ -1,12 +1,16 @@
 export { SdkClient } from "./client/SdkClient";
 export type {
   AuthProvider,
+  BatchOptions,
+  BatchProgress,
+  BatchResult,
   DatasetId,
   DatasetMetadata,
   DatasetStatus,
   DownloadOptions,
   DownloadProgress,
   DownloadResult,
+  DownloadBatchItem,
   ListDatasetsOptions,
   ListDatasetsResult,
   PreviewOptions,
@@ -16,6 +20,7 @@ export type {
   UploadOptions,
   UploadProgress,
   UploadResult,
+  UploadBatchItem,
   VerifyOptions,
   VerifyResult,
 } from "./types";
@@ -26,3 +31,4 @@ export { createS3Adapter } from "./storage/s3";
 export { httpTransport } from "./transport/http";
 export { withRetry } from "./utils/retry";
 export { isSdkError } from "./utils/errors";
+export { runBatch } from "./utils/batch";
