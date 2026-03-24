@@ -3,9 +3,11 @@ import type {
   BatchResult,
   DatasetId,
   DatasetMetadata,
+  DatasetBundleManifest,
   DownloadOptions,
   DownloadResult,
   DownloadBatchItem,
+  DownloadBundleOptions,
   ListDatasetsOptions,
   ListDatasetsResult,
   PreviewOptions,
@@ -15,8 +17,11 @@ import type {
   UploadOptions,
   UploadResult,
   UploadBatchItem,
+  UploadBundleOptions,
+  UploadBundleResult,
   VerifyOptions,
   VerifyResult,
+  VerifyBundleResult,
 } from "../types";
 import { httpTransport } from "../transport/http";
 import { SdkError } from "../types";
@@ -82,6 +87,53 @@ export class SdkClient {
       throw new SdkError("E_STORAGE", "No storage adapter configured.");
     }
     return this.storage.verify(id, options);
+  }
+
+  async uploadBundle(options: UploadBundleOptions): Promise<UploadBundleResult> {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    if (!this.storage.uploadBundle) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle uploads.");
+    }
+    return this.storage.uploadBundle(options);
+  }
+
+  async downloadBundleManifest(
+    id: DatasetId,
+    options?: DownloadBundleOptions,
+  ): Promise<DatasetBundleManifest> {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    if (!this.storage.downloadBundleManifest) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle downloads.");
+    }
+    return this.storage.downloadBundleManifest(id, options);
+  }
+
+  async downloadBundleFile(
+    id: DatasetId,
+    path: string,
+    options?: DownloadOptions,
+  ): Promise<DownloadResult> {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    if (!this.storage.downloadBundleFile) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle downloads.");
+    }
+    return this.storage.downloadBundleFile(id, path, options);
+  }
+
+  async verifyBundle(id: DatasetId, options?: DownloadBundleOptions): Promise<VerifyBundleResult> {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    if (!this.storage.verifyBundle) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle verification.");
+    }
+    return this.storage.verifyBundle(id, options);
   }
 
   async getMetadata(id: DatasetId): Promise<DatasetMetadata> {

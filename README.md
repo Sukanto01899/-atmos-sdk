@@ -84,6 +84,29 @@ const successes = batch.filter((item) => item.status === "fulfilled");
 const failures = batch.filter((item) => item.status === "rejected");
 ```
 
+### Upload bundle (multi-file)
+
+Uploads a directory CID containing your files plus `manifest.json` with per-file SHA-256 checksums.
+
+```ts
+const bundle = await client.uploadBundle({
+  metadata,
+  files: [
+    { path: "data/part-001.csv", data: fileA },
+    { path: "data/part-002.csv", data: fileB },
+  ],
+});
+
+console.log(bundle.id); // directory CID
+```
+
+### Download bundle manifest / file
+
+```ts
+const manifest = await client.downloadBundleManifest(bundle.id);
+const { data } = await client.downloadBundleFile(bundle.id, "data/part-001.csv");
+```
+
 ### Download
 
 ```ts

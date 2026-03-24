@@ -48,6 +48,61 @@ export interface UploadResult {
   sessionId?: string;
 }
 
+export interface BundleUploadFile {
+  path: string;
+  data: Blob | ArrayBuffer | ReadableStream<Uint8Array>;
+  mimeType?: string;
+}
+
+export interface DatasetBundleFileEntry {
+  path: string;
+  sizeBytes: number;
+  checksumSha256: string;
+  mimeType?: string;
+}
+
+export interface DatasetBundleManifest {
+  manifestVersion: 1;
+  createdAt: number; // unix epoch seconds
+  metadata?: DatasetMetadata;
+  files: DatasetBundleFileEntry[];
+}
+
+export interface UploadBundleProgress {
+  stage: "hashing" | "uploading";
+  file?: string;
+  completedFiles?: number;
+  totalFiles?: number;
+}
+
+export interface UploadBundleOptions {
+  metadata: DatasetMetadata;
+  files: BundleUploadFile[];
+  includeMetadataInManifest?: boolean;
+  manifestPath?: string; // default: "manifest.json"
+  onProgress?: (progress: UploadBundleProgress) => void;
+  abortSignal?: AbortSignal;
+}
+
+export interface UploadBundleResult {
+  id: DatasetId; // directory CID
+  location: string; // ipfs://, s3://, https://
+  manifest: DatasetBundleManifest;
+  manifestCid?: DatasetId;
+  fileCids?: Record<string, DatasetId>;
+}
+
+export interface DownloadBundleOptions {
+  manifestPath?: string; // default: "manifest.json"
+  abortSignal?: AbortSignal;
+}
+
+export interface VerifyBundleResult {
+  ok: boolean;
+  reason?: string;
+  mismatches?: { path: string; expected: string; actual: string }[];
+}
+
 export interface BatchOptions {
   concurrency?: number;
   stopOnError?: boolean;
@@ -158,6 +213,18 @@ export interface StorageAdapter {
   download: (id: DatasetId, options?: DownloadOptions) => Promise<DownloadResult>;
   preview: (id: DatasetId, options?: PreviewOptions) => Promise<PreviewResult>;
   verify: (id: DatasetId, options?: VerifyOptions) => Promise<VerifyResult>;
+
+  uploadBundle?: (options: UploadBundleOptions) => Promise<UploadBundleResult>;
+  downloadBundleManifest?: (
+    id: DatasetId,
+    options?: DownloadBundleOptions,
+  ) => Promise<DatasetBundleManifest>;
+  downloadBundleFile?: (
+    id: DatasetId,
+    path: string,
+    options?: DownloadOptions,
+  ) => Promise<DownloadResult>;
+  verifyBundle?: (id: DatasetId, options?: DownloadBundleOptions) => Promise<VerifyBundleResult>;
 }
 
 export interface SdkClientOptions {

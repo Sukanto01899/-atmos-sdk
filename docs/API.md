@@ -19,16 +19,24 @@ const data = await client.download(id);
 
 - `DatasetMetadata`
 - `UploadOptions`, `UploadResult`
+- `UploadBundleOptions`, `UploadBundleResult`
 - `DownloadOptions`, `DownloadResult`
+- `DownloadBundleOptions`
 - `PreviewOptions`, `PreviewResult`
 - `VerifyOptions`, `VerifyResult`
+- `DatasetBundleManifest`
+- `VerifyBundleResult`
 
 ## Methods
 
 - `upload(data, options)`
+- `uploadBundle(options)`
 - `download(id, options?)`
+- `downloadBundleManifest(id, options?)`
+- `downloadBundleFile(id, path, options?)`
 - `preview(id, options?)`
 - `verify(id, options?)`
+- `verifyBundle(id, options?)`
 - `getMetadata(id)`
 - `listDatasets(options?)`
 
