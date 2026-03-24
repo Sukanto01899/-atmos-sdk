@@ -157,6 +157,36 @@ const result = await client.verify("QmHash", {
 console.log(result.ok, result.reason);
 ```
 
+### Publish (upload + checksum + register)
+
+```ts
+import {
+  SdkClient,
+  httpTransport,
+  createHttpRegistry,
+  createStacksOnChainPublisher,
+} from "@atmos/sdk";
+
+const baseUrl = "https://api.atmos.example";
+const transport = httpTransport({ baseUrl });
+
+const client = new SdkClient({
+  baseUrl,
+  transport,
+  storage,
+  registry: createHttpRegistry(transport),
+  onchain: createStacksOnChainPublisher({ contractAddress: "SP…", contractName: "atmos-v4" }),
+});
+
+const published = await client.publish({
+  kind: "file",
+  data: file,
+  metadata,
+  target: "both",
+  broadcastOnChainTx: false, // set true if you provide `onchain.submitTx`
+});
+```
+
 ## Authentication
 
 ```ts

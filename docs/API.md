@@ -31,6 +31,7 @@ const data = await client.download(id);
 
 - `upload(data, options)`
 - `uploadBundle(options)`
+- `publish(options)`
 - `download(id, options?)`
 - `downloadBundleManifest(id, options?)`
 - `downloadBundleFile(id, path, options?)`
@@ -44,6 +45,11 @@ const data = await client.download(id);
 
 - `createIpfsAdapter()`
 - `createS3Adapter()`
+
+## Registry / On-chain Helpers
+
+- `createHttpRegistry(transport, options?)`
+- `createStacksOnChainPublisher({ contractAddress, contractName })`
 
 ### IPFS Options
 

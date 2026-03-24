@@ -227,11 +227,52 @@ export interface StorageAdapter {
   verifyBundle?: (id: DatasetId, options?: DownloadBundleOptions) => Promise<VerifyBundleResult>;
 }
 
+export interface RegistryAdapter {
+  registerDataset: (metadata: DatasetMetadata) => Promise<{
+    datasetId: string | number;
+    receipt?: unknown;
+  }>;
+}
+
+export interface OnChainPublisher {
+  buildRegisterDatasetTx: (metadata: DatasetMetadata) => Promise<unknown> | unknown;
+  submitTx?: (tx: unknown) => Promise<{ txId: string; receipt?: unknown }>;
+}
+
+export type PublishTarget = "api" | "onchain" | "both" | "none";
+
+export type PublishInput =
+  | {
+      kind: "file";
+      data: Blob | ArrayBuffer | ReadableStream<Uint8Array>;
+      upload?: Omit<UploadOptions, "metadata">;
+    }
+  | {
+      kind: "bundle";
+      files: BundleUploadFile[];
+      bundle?: Omit<UploadBundleOptions, "metadata" | "files">;
+    };
+
+export type PublishOptions = PublishInput & {
+  metadata: DatasetMetadata;
+  target?: PublishTarget;
+  broadcastOnChainTx?: boolean;
+};
+
+export interface PublishResult {
+  metadata: DatasetMetadata;
+  upload: UploadResult | UploadBundleResult;
+  api?: { datasetId: string | number; receipt?: unknown };
+  onchain?: { tx: unknown; txId?: string; receipt?: unknown };
+}
+
 export interface SdkClientOptions {
   baseUrl: string;
   auth?: AuthProvider;
   transport?: Transport;
   storage?: StorageAdapter;
+  registry?: RegistryAdapter;
+  onchain?: OnChainPublisher;
 }
 
 export class SdkError extends Error {
