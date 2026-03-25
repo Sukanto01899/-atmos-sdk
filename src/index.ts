@@ -46,6 +46,11 @@ export { createHttpRegistry } from "./registry/http";
 export type { HttpRegistryOptions } from "./registry/http";
 export { createStacksOnChainPublisher } from "./onchain/stacks";
 export type { StacksOnChainPublisherOptions, StacksRegisterDatasetTx } from "./onchain/stacks";
+export { createStacksConnectOnChainPublisher } from "./onchain/stacks-connect";
+export type {
+  StacksConnectOnChainPublisherOptions,
+  StacksConnectContractCallBaseOptions,
+} from "./onchain/stacks-connect";
 export { withRetry } from "./utils/retry";
 export { isSdkError } from "./utils/errors";
 export { runBatch } from "./utils/batch";

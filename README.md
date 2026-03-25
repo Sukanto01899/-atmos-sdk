@@ -183,7 +183,7 @@ const published = await client.publish({
   data: file,
   metadata,
   target: "both",
-  broadcastOnChainTx: false, // set true if you provide `onchain.submitTx`
+  broadcastOnChainTx: false, // for wallet flow, use createStacksConnectOnChainPublisher(...)
 });
 ```
 

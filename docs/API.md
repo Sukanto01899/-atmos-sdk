@@ -50,6 +50,7 @@ const data = await client.download(id);
 
 - `createHttpRegistry(transport, options?)`
 - `createStacksOnChainPublisher({ contractAddress, contractName })`
+- `createStacksConnectOnChainPublisher({ contractAddress, contractName, contractCall })`
 
 ### IPFS Options
 
