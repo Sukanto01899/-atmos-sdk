@@ -8,6 +8,7 @@ import type {
   DownloadResult,
   DownloadBatchItem,
   DownloadBundleOptions,
+  HealthResult,
   ListDatasetsOptions,
   ListDatasetsResult,
   OnChainPublisher,
@@ -145,6 +146,10 @@ export class SdkClient {
       throw new SdkError("E_STORAGE", "Storage adapter does not support bundle verification.");
     }
     return this.storage.verifyBundle(id, options);
+  }
+
+  async health(): Promise<HealthResult> {
+    return this.transport.request("GET", `/health`);
   }
 
   async publish(options: PublishOptions): Promise<PublishResult> {

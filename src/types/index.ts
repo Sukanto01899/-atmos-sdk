@@ -189,6 +189,11 @@ export interface ListDatasetsResult {
   nextCursor?: string;
 }
 
+export interface HealthResult {
+  ok: boolean;
+  [key: string]: unknown;
+}
+
 export interface AuthProvider {
   getAccessToken: () => Promise<string>;
 }

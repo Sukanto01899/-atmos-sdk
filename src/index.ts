@@ -13,6 +13,7 @@ export type {
   DownloadResult,
   DownloadBatchItem,
   DownloadBundleOptions,
+  HealthResult,
   ListDatasetsOptions,
   ListDatasetsResult,
   PreviewOptions,

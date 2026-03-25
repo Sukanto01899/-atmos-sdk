@@ -29,6 +29,7 @@ const data = await client.download(id);
 
 ## Methods
 
+- `health()`
 - `upload(data, options)`
 - `uploadBundle(options)`
 - `publish(options)`
