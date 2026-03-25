@@ -1,5 +1,6 @@
 import type { SdkClientOptions, Transport } from "../types";
 import { SdkError } from "../types";
+import { toQueryString } from "../utils/query";
 
 export const httpTransport = (options: SdkClientOptions): Transport => ({
   async request<T>(
@@ -11,9 +12,16 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
       signal?: AbortSignal;
     },
   ) {
-    const url = `${options.baseUrl}${path}`;
+    const isQueryBodyMethod = method === "GET" || method === "DELETE";
+    const query =
+      isQueryBodyMethod && req?.body && typeof req.body === "object"
+        ? toQueryString(req.body as Record<string, string | number | boolean | undefined>)
+        : "";
+
+    const url = `${options.baseUrl}${path}${query}`;
+    const hasJsonBody = !isQueryBodyMethod && req?.body !== undefined;
     const headers: Record<string, string> = {
-      "content-type": "application/json",
+      ...(hasJsonBody ? { "content-type": "application/json" } : {}),
       ...(req?.headers ?? {}),
     };
 
@@ -25,7 +33,7 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
     const response = await fetch(url, {
       method,
       headers,
-      body: req?.body ? JSON.stringify(req.body) : undefined,
+      body: hasJsonBody ? JSON.stringify(req.body) : undefined,
       signal: req?.signal,
     });
 
@@ -43,6 +51,10 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
       return undefined as T;
     }
 
-    return (await response.json()) as T;
+    const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.includes("application/json")) {
+      return (await response.json()) as T;
+    }
+    return (await response.text()) as T;
   },
 });
