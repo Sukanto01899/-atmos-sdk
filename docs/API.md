@@ -79,4 +79,6 @@ await client.upload(file, {
 
 - `withRetry(fn, retries?, delayMs?)`
 - `isSdkError(err)`
+- `parseCsvWithHeader(text, maxRows)`
+- `inferSchema(rows, options?)`
 ```

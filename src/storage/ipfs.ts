@@ -16,6 +16,8 @@ import type {
   VerifyResult,
 } from "../types";
 import { SdkError } from "../types";
+import { parseCsvWithHeader } from "../utils/csv";
+import { inferSchema } from "../utils/schema";
 
 export interface IpfsAdapterOptions {
   endpoint: string;
@@ -98,20 +100,6 @@ const fetchJson = async <T>(
     throw new SdkError("E_IPFS", `IPFS request failed: ${text}`, response.status);
   }
   return (await response.json()) as T;
-};
-
-const parseCsv = (text: string, maxRows: number) => {
-  const lines = text.trim().split(/\r?\n/);
-  if (lines.length === 0) return [];
-  const header = lines[0].split(",").map((col) => col.trim());
-  return lines.slice(1, maxRows + 1).map((line) => {
-    const values = line.split(",");
-    const row: Record<string, unknown> = {};
-    header.forEach((key, index) => {
-      row[key] = values[index]?.trim() ?? "";
-    });
-    return row;
-  });
 };
 
 const toHex = (buffer: ArrayBuffer) =>
@@ -357,16 +345,42 @@ export const createIpfsAdapter = (options: IpfsAdapterOptions): StorageAdapter =
       if (!data) return { rows: [] };
 
       const text = new TextDecoder().decode(data);
-      if (format === "json" || (format === "auto" && text.trim().startsWith("{"))) {
-        const parsed = JSON.parse(text) as Record<string, unknown> | Record<string, unknown>[];
-        const rows = Array.isArray(parsed)
-          ? parsed.slice(0, maxRows)
-          : [parsed].slice(0, maxRows);
-        return { rows };
+      const trimmed = text.trim();
+      if (
+        format === "json" ||
+        (format === "auto" && (trimmed.startsWith("{") || trimmed.startsWith("[")))
+      ) {
+        try {
+          const parsed = JSON.parse(trimmed) as
+            | Record<string, unknown>
+            | Record<string, unknown>[];
+          const rows = Array.isArray(parsed)
+            ? (parsed.slice(0, maxRows) as Record<string, unknown>[])
+            : ([parsed] as Record<string, unknown>[]).slice(0, maxRows);
+          return { rows, schema: inferSchema(rows) };
+        } catch (error) {
+          if (format === "json") {
+            throw error;
+          }
+          // auto mode: fall through for NDJSON/CSV detection
+        }
       }
 
-      const rows = parseCsv(text, maxRows);
-      return { rows };
+      if (format === "auto") {
+        const lines = trimmed.split(/\r?\n/).filter((line) => line.trim().length > 0);
+        if (
+          lines.length > 1 &&
+          lines.every((line) => line.trim().startsWith("{") && line.trim().endsWith("}"))
+        ) {
+          const parsedRows = lines
+            .slice(0, maxRows)
+            .map((line) => JSON.parse(line) as Record<string, unknown>);
+          return { rows: parsedRows, schema: inferSchema(parsedRows) };
+        }
+      }
+
+      const { rows } = parseCsvWithHeader(text, maxRows);
+      return { rows, schema: inferSchema(rows, { coerceStrings: true }) };
     },
 
     async verify(id: DatasetId, verifyOptions?: VerifyOptions): Promise<VerifyResult> {

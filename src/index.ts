@@ -61,3 +61,5 @@ export {
   sha256HexFromText,
 } from "./utils/hash";
 export { toQueryString } from "./utils/query";
+export { parseCsvWithHeader } from "./utils/csv";
+export { inferSchema } from "./utils/schema";

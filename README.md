@@ -147,6 +147,8 @@ const preview = await client.preview("QmHash", { maxRows: 5, format: "csv" });
 console.table(preview.rows);
 ```
 
+Preview now returns `schema` when available (CSV/JSON/NDJSON auto-detect).
+
 ### Verify
 
 ```ts
