@@ -60,3 +60,4 @@ export {
   sha256HexFromArrayBuffer,
   sha256HexFromText,
 } from "./utils/hash";
+export { toQueryString } from "./utils/query";

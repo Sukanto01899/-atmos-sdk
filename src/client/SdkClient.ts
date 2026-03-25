@@ -32,6 +32,7 @@ import { httpTransport } from "../transport/http";
 import { SdkError } from "../types";
 import { runBatch } from "../utils/batch";
 import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
+import { toQueryString } from "../utils/query";
 
 export class SdkClient {
   private readonly baseUrl: string;
@@ -246,8 +247,16 @@ export class SdkClient {
   }
 
   async listDatasets(options?: ListDatasetsOptions): Promise<ListDatasetsResult> {
-    return this.transport.request("GET", `/datasets`, {
-      body: options,
+    const qs = toQueryString({
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      from: options?.from,
+      to: options?.to,
+      limit: options?.limit,
+      cursor: options?.cursor,
     });
+    return this.transport.request("GET", `/datasets${qs}`);
   }
 }

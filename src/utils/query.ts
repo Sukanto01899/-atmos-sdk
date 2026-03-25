@@ -1,0 +1,10 @@
+export const toQueryString = (params: Record<string, string | number | boolean | undefined>) => {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined) continue;
+    search.set(key, String(value));
+  }
+  const qs = search.toString();
+  return qs ? `?${qs}` : "";
+};
+
