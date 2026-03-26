@@ -40,7 +40,7 @@ const data = await client.download(id);
 - `verify(id, options?)`
 - `verifyBundle(id, options?)`
 - `getMetadata(id)`
-- `listDatasets(options?)` (sent as query params)
+- `listDatasets(options?)` (sent as query params; supports `limit`, `cursor`, and `sort`)
 
 ## Storage Adapters
 

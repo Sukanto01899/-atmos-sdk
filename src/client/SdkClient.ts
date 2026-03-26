@@ -36,14 +36,12 @@ import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 
 export class SdkClient {
-  private readonly baseUrl: string;
   private readonly transport;
   private readonly storage?: StorageAdapter;
   private readonly registry?: RegistryAdapter;
   private readonly onchain?: OnChainPublisher;
 
   constructor(options: SdkClientOptions) {
-    this.baseUrl = options.baseUrl.replace(/\/$/, "");
     this.transport = options.transport ?? httpTransport(options);
     this.storage = options.storage;
     this.registry = options.registry;
@@ -257,10 +255,12 @@ export class SdkClient {
       dataType: options?.dataType,
       status: options?.status,
       isPublic: options?.isPublic,
+      visibility: options?.visibility,
       from: options?.from,
       to: options?.to,
       limit: options?.limit,
       cursor: options?.cursor,
+      sort: options?.sort,
     });
     return this.transport.request("GET", `/datasets${qs}`);
   }

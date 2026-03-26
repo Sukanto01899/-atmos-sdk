@@ -189,6 +189,15 @@ const published = await client.publish({
 });
 ```
 
+## Listing datasets (pagination)
+
+```ts
+const page1 = await client.listDatasets({ limit: 25, cursor: "0", sort: "created_at_desc" });
+const page2 = page1.nextCursor
+  ? await client.listDatasets({ limit: 25, cursor: page1.nextCursor, sort: "created_at_desc" })
+  : null;
+```
+
 ## Authentication
 
 ```ts

@@ -182,6 +182,8 @@ export interface ListDatasetsOptions {
   to?: number;
   limit?: number;
   cursor?: string;
+  sort?: string;
+  visibility?: "public" | "private";
 }
 
 export interface ListDatasetsResult {
