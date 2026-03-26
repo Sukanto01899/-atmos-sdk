@@ -11,6 +11,7 @@ import type {
   HealthResult,
   ListDatasetsOptions,
   ListDatasetsResult,
+  ListTagsResult,
   OnChainPublisher,
   PreviewOptions,
   PreviewResult,
@@ -264,5 +265,21 @@ export class SdkClient {
       sort: options?.sort,
     });
     return this.transport.request("GET", `/datasets${qs}`);
+  }
+
+  async listTags(options?: ListDatasetsOptions): Promise<ListTagsResult> {
+    const qs = toQueryString({
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      visibility: options?.visibility,
+      from: options?.from,
+      to: options?.to,
+      tags: options?.tags,
+      sort: options?.sort,
+    });
+
+    return this.transport.request("GET", `/tags${qs}`);
   }
 }

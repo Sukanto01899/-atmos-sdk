@@ -16,6 +16,8 @@ export type {
   HealthResult,
   ListDatasetsOptions,
   ListDatasetsResult,
+  ListTagsResult,
+  TagCount,
   PreviewOptions,
   PreviewResult,
   DatasetBundleFileEntry,

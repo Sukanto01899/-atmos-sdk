@@ -192,6 +192,17 @@ export interface ListDatasetsResult {
   nextCursor?: string;
 }
 
+export interface TagCount {
+  tag: string;
+  count: number;
+}
+
+export interface ListTagsResult {
+  totalDatasets: number;
+  totalTags: number;
+  items: TagCount[];
+}
+
 export interface HealthResult {
   ok: boolean;
   [key: string]: unknown;

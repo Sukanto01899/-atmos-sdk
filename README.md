@@ -203,6 +203,13 @@ const page2 = page1.nextCursor
   : null;
 ```
 
+## Listing tags
+
+```ts
+const tags = await client.listTags({ isPublic: true });
+console.table(tags.items);
+```
+
 ## Authentication
 
 ```ts
