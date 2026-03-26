@@ -180,6 +180,7 @@ export interface ListDatasetsOptions {
   isPublic?: boolean;
   from?: number;
   to?: number;
+  tags?: string[];
   limit?: number;
   cursor?: string;
   sort?: string;

@@ -41,6 +41,7 @@ const data = await client.download(id);
 - `verifyBundle(id, options?)`
 - `getMetadata(id)`
 - `listDatasets(options?)` (sent as query params; supports `limit`, `cursor`, and `sort`)
+  - `tags` is sent as a comma-separated list (example: `tags=wind,hourly`)
 
 ## Storage Adapters
 

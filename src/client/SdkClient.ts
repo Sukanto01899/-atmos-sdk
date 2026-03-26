@@ -258,6 +258,7 @@ export class SdkClient {
       visibility: options?.visibility,
       from: options?.from,
       to: options?.to,
+      tags: options?.tags,
       limit: options?.limit,
       cursor: options?.cursor,
       sort: options?.sort,
