@@ -10,6 +10,9 @@ import type {
   DownloadBundleOptions,
   HealthResult,
   ListDatasetsOptions,
+  ListDatasetsAllOptions,
+  ListDatasetsAllProgress,
+  ListDatasetsAllResult,
   ListDatasetsCsvParsedResult,
   ListDatasetsResult,
   ListTagsResult,
@@ -278,6 +281,57 @@ export class SdkClient {
       sort: options?.sort,
     });
     return this.transport.request("GET", `/datasets${qs}`);
+  }
+
+  async listDatasetsAll(options?: ListDatasetsAllOptions): Promise<ListDatasetsAllResult> {
+    const pageSize = options?.limit ?? 50;
+    const maxPages = Math.max(1, options?.maxPages ?? 50);
+    const maxItems = Math.max(1, options?.maxItems ?? 10_000);
+
+    let cursor = options?.startCursor;
+    let pagesFetched = 0;
+    const items: DatasetMetadata[] = [];
+
+    const report = (nextCursor?: string) => {
+      const progress: ListDatasetsAllProgress = {
+        pagesFetched,
+        itemsFetched: items.length,
+        nextCursor,
+      };
+      options?.onProgress?.(progress);
+    };
+
+    while (pagesFetched < maxPages && items.length < maxItems) {
+      const qs = toQueryString({
+        owner: options?.owner,
+        dataType: options?.dataType,
+        status: options?.status,
+        isPublic: options?.isPublic,
+        visibility: options?.visibility,
+        from: options?.from,
+        to: options?.to,
+        tags: options?.tags,
+        limit: Math.min(pageSize, maxItems - items.length),
+        cursor,
+        sort: options?.sort,
+      });
+
+      const result = await this.transport.request<ListDatasetsResult>("GET", `/datasets${qs}`, {
+        signal: options?.abortSignal,
+      });
+
+      pagesFetched += 1;
+      items.push(...(result.items ?? []));
+      report(result.nextCursor);
+
+      if (!result.nextCursor) {
+        return { items, pagesFetched, nextCursor: undefined };
+      }
+
+      cursor = result.nextCursor;
+    }
+
+    return { items, pagesFetched, nextCursor: cursor };
   }
 
   async listDatasetsCsv(options?: ListDatasetsOptions): Promise<string> {

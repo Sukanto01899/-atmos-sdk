@@ -197,6 +197,26 @@ export interface ListDatasetsCsvParsedResult {
   rows: Record<string, unknown>[];
 }
 
+export interface ListDatasetsAllProgress {
+  pagesFetched: number;
+  itemsFetched: number;
+  nextCursor?: string;
+}
+
+export interface ListDatasetsAllOptions extends Omit<ListDatasetsOptions, "cursor"> {
+  startCursor?: string;
+  maxPages?: number;
+  maxItems?: number;
+  onProgress?: (progress: ListDatasetsAllProgress) => void;
+  abortSignal?: AbortSignal;
+}
+
+export interface ListDatasetsAllResult {
+  items: DatasetMetadata[];
+  pagesFetched: number;
+  nextCursor?: string;
+}
+
 export interface TagCount {
   tag: string;
   count: number;
