@@ -337,6 +337,78 @@ export class SdkClient {
     return { items, pagesFetched, nextCursor: cursor };
   }
 
+  async *listDatasetsPages(
+    options?: ListDatasetsAllOptions,
+  ): AsyncGenerator<ListDatasetsResult, void, void> {
+    const pageSize = options?.limit ?? 50;
+    const maxPages = Math.max(1, options?.maxPages ?? 50);
+    const maxItems = Math.max(1, options?.maxItems ?? 10_000);
+
+    let cursor = options?.startCursor;
+    let pagesFetched = 0;
+    let itemsFetched = 0;
+
+    const report = (nextCursor?: string) => {
+      const progress: ListDatasetsAllProgress = {
+        pagesFetched,
+        itemsFetched,
+        nextCursor,
+      };
+      options?.onProgress?.(progress);
+    };
+
+    while (pagesFetched < maxPages && itemsFetched < maxItems) {
+      const limit = Math.min(pageSize, maxItems - itemsFetched);
+      const qs = toQueryString({
+        search: options?.search,
+        owner: options?.owner,
+        dataType: options?.dataType,
+        status: options?.status,
+        isPublic: options?.isPublic,
+        visibility: options?.visibility,
+        from: options?.from,
+        to: options?.to,
+        tags: options?.tags,
+        limit,
+        cursor,
+        sort: options?.sort,
+      });
+
+      const result = await this.transport.request<ListDatasetsResult>("GET", `/datasets${qs}`, {
+        signal: options?.abortSignal,
+      });
+
+      pagesFetched += 1;
+      itemsFetched += (result.items ?? []).length;
+      report(result.nextCursor);
+
+      yield result;
+
+      if (!result.nextCursor) {
+        return;
+      }
+
+      cursor = result.nextCursor;
+    }
+  }
+
+  async *iterateDatasets(
+    options?: ListDatasetsAllOptions,
+  ): AsyncGenerator<DatasetMetadata, void, void> {
+    const maxItems = Math.max(1, options?.maxItems ?? 10_000);
+    let yielded = 0;
+
+    for await (const page of this.listDatasetsPages(options)) {
+      for (const item of page.items ?? []) {
+        yield item;
+        yielded += 1;
+        if (yielded >= maxItems) {
+          return;
+        }
+      }
+    }
+  }
+
   async listDatasetsCsv(options?: ListDatasetsOptions): Promise<string> {
     const qs = toQueryString({
       search: options?.search,
