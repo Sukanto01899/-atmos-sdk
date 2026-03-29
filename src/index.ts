@@ -15,6 +15,7 @@ export type {
   DownloadBundleOptions,
   HealthResult,
   ListDatasetsOptions,
+  ListDatasetsCsvParsedResult,
   ListDatasetsResult,
   DatasetsGeoJsonFeatureCollection,
   ListTagsResult,

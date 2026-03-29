@@ -1,6 +1,13 @@
 import { SdkError } from "../types";
 
+const stripUtf8Bom = (text: string) => {
+  if (!text) return text;
+  // U+FEFF (BOM) sometimes appears at the start of CSV content.
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+};
+
 const parseCsvTable = (text: string) => {
+  const input = stripUtf8Bom(text);
   const rows: string[][] = [];
   let row: string[] = [];
   let field = "";
@@ -18,12 +25,12 @@ const parseCsvTable = (text: string) => {
     row = [];
   };
 
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index];
 
     if (inQuotes) {
       if (char === '"') {
-        const next = text[index + 1];
+        const next = input[index + 1];
         if (next === '"') {
           field += '"';
           index += 1;
@@ -95,4 +102,3 @@ export const parseCsvWithHeader = (text: string, maxRows: number) => {
 
   return { header, rows };
 };
-

@@ -10,6 +10,7 @@ import type {
   DownloadBundleOptions,
   HealthResult,
   ListDatasetsOptions,
+  ListDatasetsCsvParsedResult,
   ListDatasetsResult,
   ListTagsResult,
   DatasetsGeoJsonFeatureCollection,
@@ -36,6 +37,7 @@ import { SdkError } from "../types";
 import { runBatch } from "../utils/batch";
 import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
+import { parseCsvWithHeader } from "../utils/csv";
 
 export class SdkClient {
   private readonly transport;
@@ -283,6 +285,14 @@ export class SdkClient {
       sort: options?.sort,
     });
     return this.transport.request("GET", `/datasets.csv${qs}`);
+  }
+
+  async listDatasetsCsvParsed(
+    options?: ListDatasetsOptions,
+    maxRows = 1000,
+  ): Promise<ListDatasetsCsvParsedResult> {
+    const csv = await this.listDatasetsCsv(options);
+    return parseCsvWithHeader(csv, maxRows);
   }
 
   async listDatasetsGeoJson(

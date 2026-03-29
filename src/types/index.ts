@@ -192,6 +192,11 @@ export interface ListDatasetsResult {
   nextCursor?: string;
 }
 
+export interface ListDatasetsCsvParsedResult {
+  header: string[];
+  rows: Record<string, unknown>[];
+}
+
 export interface TagCount {
   tag: string;
   count: number;
