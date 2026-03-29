@@ -43,6 +43,7 @@ import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
 import { toIpfsGatewayUrl } from "../utils/ipfs";
+import { toStacksExplorerAddressUrl } from "../utils/stacksExplorer";
 
 export class SdkClient {
   private readonly transport;
@@ -264,6 +265,14 @@ export class SdkClient {
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
     return toIpfsGatewayUrl(metadata.ipfsHash ?? "", gatewayBase);
+  }
+
+  async getDatasetOwnerExplorerUrl(
+    id: DatasetId,
+    options?: { chain?: "mainnet" | "testnet"; baseUrl?: string },
+  ): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    return toStacksExplorerAddressUrl(metadata.owner ?? "", options);
   }
 
   async getMetadataBatch(
