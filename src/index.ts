@@ -16,6 +16,7 @@ export type {
   HealthResult,
   ListDatasetsOptions,
   ListDatasetsResult,
+  DatasetsGeoJsonFeatureCollection,
   ListTagsResult,
   TagCount,
   PreviewOptions,

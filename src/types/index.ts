@@ -203,6 +203,46 @@ export interface ListTagsResult {
   items: TagCount[];
 }
 
+export type GeoJsonPosition = [number, number];
+
+export interface GeoJsonPoint {
+  type: "Point";
+  coordinates: GeoJsonPosition;
+}
+
+export interface DatasetsGeoJsonFeature {
+  type: "Feature";
+  id: string | number;
+  geometry: GeoJsonPoint;
+  properties: {
+    name: string;
+    description?: string;
+    dataType: string;
+    tags?: string[];
+    status?: DatasetStatus;
+    owner?: string;
+    isPublic?: boolean;
+    verified?: boolean;
+    metadataFrozen?: boolean;
+    collectionDate?: number;
+    createdAt?: number;
+    altitudeMin?: number;
+    altitudeMax?: number;
+    ipfsHash?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface DatasetsGeoJsonFeatureCollection {
+  type: "FeatureCollection";
+  generatedAt?: string;
+  activeTab?: string;
+  totalVisible?: number;
+  sortMode?: string;
+  filters?: unknown;
+  features: DatasetsGeoJsonFeature[];
+}
+
 export interface HealthResult {
   ok: boolean;
   [key: string]: unknown;

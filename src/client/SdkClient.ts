@@ -12,6 +12,7 @@ import type {
   ListDatasetsOptions,
   ListDatasetsResult,
   ListTagsResult,
+  DatasetsGeoJsonFeatureCollection,
   OnChainPublisher,
   PreviewOptions,
   PreviewResult,
@@ -265,6 +266,42 @@ export class SdkClient {
       sort: options?.sort,
     });
     return this.transport.request("GET", `/datasets${qs}`);
+  }
+
+  async listDatasetsCsv(options?: ListDatasetsOptions): Promise<string> {
+    const qs = toQueryString({
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      visibility: options?.visibility,
+      from: options?.from,
+      to: options?.to,
+      tags: options?.tags,
+      limit: options?.limit,
+      cursor: options?.cursor,
+      sort: options?.sort,
+    });
+    return this.transport.request("GET", `/datasets.csv${qs}`);
+  }
+
+  async listDatasetsGeoJson(
+    options?: ListDatasetsOptions,
+  ): Promise<DatasetsGeoJsonFeatureCollection> {
+    const qs = toQueryString({
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      visibility: options?.visibility,
+      from: options?.from,
+      to: options?.to,
+      tags: options?.tags,
+      limit: options?.limit,
+      cursor: options?.cursor,
+      sort: options?.sort,
+    });
+    return this.transport.request("GET", `/datasets.geojson${qs}`);
   }
 
   async listTags(options?: ListDatasetsOptions): Promise<ListTagsResult> {
