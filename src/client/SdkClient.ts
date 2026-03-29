@@ -42,6 +42,7 @@ import { runBatch } from "../utils/batch";
 import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
+import { toIpfsGatewayUrl } from "../utils/ipfs";
 
 export class SdkClient {
   private readonly transport;
@@ -255,6 +256,14 @@ export class SdkClient {
 
   async getMetadata(id: DatasetId): Promise<DatasetMetadata> {
     return this.transport.request("GET", `/datasets/${id}`);
+  }
+
+  async getDatasetIpfsGatewayUrl(
+    id: DatasetId,
+    gatewayBase?: string,
+  ): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    return toIpfsGatewayUrl(metadata.ipfsHash ?? "", gatewayBase);
   }
 
   async getMetadataBatch(
