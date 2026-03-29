@@ -253,6 +253,16 @@ export class SdkClient {
     return this.transport.request("GET", `/datasets/${id}`);
   }
 
+  async getMetadataBatch(
+    ids: DatasetId[],
+    options?: BatchOptions,
+  ): Promise<BatchResult<DatasetId, DatasetMetadata>[]> {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return [];
+    }
+    return runBatch(ids, (id) => this.getMetadata(id), options);
+  }
+
   async listDatasets(options?: ListDatasetsOptions): Promise<ListDatasetsResult> {
     const qs = toQueryString({
       owner: options?.owner,
