@@ -14,6 +14,7 @@ describe("listDatasets()", () => {
     });
 
     await client.listDatasets({
+      search: "wind",
       owner: "SP123",
       status: "verified",
       isPublic: true,
@@ -24,8 +25,9 @@ describe("listDatasets()", () => {
     expect(request).toHaveBeenCalledTimes(1);
     const [method, path, options] = request.mock.calls[0];
     expect(method).toBe("GET");
-    expect(path).toBe("/datasets?owner=SP123&status=verified&isPublic=true&limit=10&cursor=abc");
+    expect(path).toBe(
+      "/datasets?search=wind&owner=SP123&status=verified&isPublic=true&limit=10&cursor=abc",
+    );
     expect(options).toBeUndefined();
   });
 });
-

@@ -174,6 +174,7 @@ export interface VerifyResult {
 }
 
 export interface ListDatasetsOptions {
+  search?: string;
   owner?: string;
   dataType?: string;
   status?: DatasetStatus;
@@ -266,6 +267,13 @@ export interface DatasetsGeoJsonFeatureCollection {
   sortMode?: string;
   filters?: unknown;
   features: DatasetsGeoJsonFeature[];
+}
+
+export interface SummaryResult {
+  total: number;
+  verified: number;
+  public: number;
+  statuses: Record<string, number>;
 }
 
 export interface HealthResult {

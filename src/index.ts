@@ -22,6 +22,7 @@ export type {
   ListDatasetsResult,
   DatasetsGeoJsonFeatureCollection,
   ListTagsResult,
+  SummaryResult,
   TagCount,
   PreviewOptions,
   PreviewResult,

@@ -25,6 +25,7 @@ import type {
   PublishTarget,
   RegistryAdapter,
   SdkClientOptions,
+  SummaryResult,
   StorageAdapter,
   UploadOptions,
   UploadResult,
@@ -268,6 +269,7 @@ export class SdkClient {
 
   async listDatasets(options?: ListDatasetsOptions): Promise<ListDatasetsResult> {
     const qs = toQueryString({
+      search: options?.search,
       owner: options?.owner,
       dataType: options?.dataType,
       status: options?.status,
@@ -303,6 +305,7 @@ export class SdkClient {
 
     while (pagesFetched < maxPages && items.length < maxItems) {
       const qs = toQueryString({
+        search: options?.search,
         owner: options?.owner,
         dataType: options?.dataType,
         status: options?.status,
@@ -336,6 +339,7 @@ export class SdkClient {
 
   async listDatasetsCsv(options?: ListDatasetsOptions): Promise<string> {
     const qs = toQueryString({
+      search: options?.search,
       owner: options?.owner,
       dataType: options?.dataType,
       status: options?.status,
@@ -363,6 +367,7 @@ export class SdkClient {
     options?: ListDatasetsOptions,
   ): Promise<DatasetsGeoJsonFeatureCollection> {
     const qs = toQueryString({
+      search: options?.search,
       owner: options?.owner,
       dataType: options?.dataType,
       status: options?.status,
@@ -380,6 +385,7 @@ export class SdkClient {
 
   async listTags(options?: ListDatasetsOptions): Promise<ListTagsResult> {
     const qs = toQueryString({
+      search: options?.search,
       owner: options?.owner,
       dataType: options?.dataType,
       status: options?.status,
@@ -392,5 +398,22 @@ export class SdkClient {
     });
 
     return this.transport.request("GET", `/tags${qs}`);
+  }
+
+  async getSummary(options?: ListDatasetsOptions): Promise<SummaryResult> {
+    const qs = toQueryString({
+      search: options?.search,
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      visibility: options?.visibility,
+      from: options?.from,
+      to: options?.to,
+      tags: options?.tags,
+      sort: options?.sort,
+    });
+
+    return this.transport.request("GET", `/summary${qs}`);
   }
 }
