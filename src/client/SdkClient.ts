@@ -58,78 +58,127 @@ export class SdkClient {
     this.onchain = options.onchain;
   }
 
+  private getStorage(): StorageAdapter {
+    if (!this.storage) {
+      throw new SdkError("E_STORAGE", "No storage adapter configured.");
+    }
+    return this.storage;
+  }
+
+  private getBundleUploadStorage(): Required<Pick<StorageAdapter, "uploadBundle">> &
+    StorageAdapter {
+    const storage = this.getStorage();
+    if (!storage.uploadBundle) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle uploads.");
+    }
+    return storage as Required<Pick<StorageAdapter, "uploadBundle">> & StorageAdapter;
+  }
+
+  private getBundleDownloadStorage(): Required<
+    Pick<StorageAdapter, "downloadBundleManifest" | "downloadBundleFile">
+  > &
+    StorageAdapter {
+    const storage = this.getStorage();
+    if (!storage.downloadBundleManifest || !storage.downloadBundleFile) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle downloads.");
+    }
+    return storage as Required<
+      Pick<StorageAdapter, "downloadBundleManifest" | "downloadBundleFile">
+    > &
+      StorageAdapter;
+  }
+
+  private getBundleVerifyStorage(): Required<Pick<StorageAdapter, "verifyBundle">> &
+    StorageAdapter {
+    const storage = this.getStorage();
+    if (!storage.verifyBundle) {
+      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle verification.");
+    }
+    return storage as Required<Pick<StorageAdapter, "verifyBundle">> & StorageAdapter;
+  }
+
+  private buildDatasetQuery(options?: ListDatasetsOptions) {
+    return {
+      search: options?.search,
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      visibility: options?.visibility,
+      from: options?.from,
+      to: options?.to,
+      tags: options?.tags,
+      limit: options?.limit,
+      cursor: options?.cursor,
+      sort: options?.sort,
+    };
+  }
+
+  private buildDatasetCollectionQuery(
+    options?: ListDatasetsAllOptions,
+    cursor?: string,
+    limit?: number,
+  ) {
+    return {
+      search: options?.search,
+      owner: options?.owner,
+      dataType: options?.dataType,
+      status: options?.status,
+      isPublic: options?.isPublic,
+      visibility: options?.visibility,
+      from: options?.from,
+      to: options?.to,
+      tags: options?.tags,
+      limit,
+      cursor,
+      sort: options?.sort,
+    };
+  }
+
   async upload(
     data: Blob | ArrayBuffer | ReadableStream<Uint8Array>,
     options: UploadOptions,
   ): Promise<UploadResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    return this.storage.upload(data, options);
+    return this.getStorage().upload(data, options);
   }
 
   async uploadBatch(
     items: UploadBatchItem[],
     options?: BatchOptions,
   ): Promise<BatchResult<UploadBatchItem, UploadResult>[]> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    return runBatch(items, (item) => this.storage!.upload(item.data, item.options), options);
+    const storage = this.getStorage();
+    return runBatch(items, (item) => storage.upload(item.data, item.options), options);
   }
 
   async download(id: DatasetId, options?: DownloadOptions): Promise<DownloadResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    return this.storage.download(id, options);
+    return this.getStorage().download(id, options);
   }
 
   async downloadBatch(
     items: DownloadBatchItem[],
     options?: BatchOptions,
   ): Promise<BatchResult<DownloadBatchItem, DownloadResult>[]> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    return runBatch(items, (item) => this.storage!.download(item.id, item.options), options);
+    const storage = this.getStorage();
+    return runBatch(items, (item) => storage.download(item.id, item.options), options);
   }
 
   async preview(id: DatasetId, options?: PreviewOptions): Promise<PreviewResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    return this.storage.preview(id, options);
+    return this.getStorage().preview(id, options);
   }
 
   async verify(id: DatasetId, options?: VerifyOptions): Promise<VerifyResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    return this.storage.verify(id, options);
+    return this.getStorage().verify(id, options);
   }
 
   async uploadBundle(options: UploadBundleOptions): Promise<UploadBundleResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    if (!this.storage.uploadBundle) {
-      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle uploads.");
-    }
-    return this.storage.uploadBundle(options);
+    return this.getBundleUploadStorage().uploadBundle(options);
   }
 
   async downloadBundleManifest(
     id: DatasetId,
     options?: DownloadBundleOptions,
   ): Promise<DatasetBundleManifest> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    if (!this.storage.downloadBundleManifest) {
-      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle downloads.");
-    }
-    return this.storage.downloadBundleManifest(id, options);
+    return this.getBundleDownloadStorage().downloadBundleManifest(id, options);
   }
 
   async downloadBundleFile(
@@ -137,23 +186,11 @@ export class SdkClient {
     path: string,
     options?: DownloadOptions,
   ): Promise<DownloadResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    if (!this.storage.downloadBundleFile) {
-      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle downloads.");
-    }
-    return this.storage.downloadBundleFile(id, path, options);
+    return this.getBundleDownloadStorage().downloadBundleFile(id, path, options);
   }
 
   async verifyBundle(id: DatasetId, options?: DownloadBundleOptions): Promise<VerifyBundleResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
-    if (!this.storage.verifyBundle) {
-      throw new SdkError("E_STORAGE", "Storage adapter does not support bundle verification.");
-    }
-    return this.storage.verifyBundle(id, options);
+    return this.getBundleVerifyStorage().verifyBundle(id, options);
   }
 
   async health(): Promise<HealthResult> {
@@ -161,9 +198,7 @@ export class SdkClient {
   }
 
   async publish(options: PublishOptions): Promise<PublishResult> {
-    if (!this.storage) {
-      throw new SdkError("E_STORAGE", "No storage adapter configured.");
-    }
+    const storage = this.getStorage();
 
     const inferredTarget: PublishTarget =
       options.target ??
@@ -195,13 +230,11 @@ export class SdkClient {
         ...(options.upload ?? {}),
       };
 
-      upload = await this.storage.upload(uploadData, uploadOptions);
+      upload = await storage.upload(uploadData, uploadOptions);
     } else {
-      if (!this.storage.uploadBundle) {
-        throw new SdkError("E_STORAGE", "Storage adapter does not support bundle uploads.");
-      }
+      const bundleStorage = this.getBundleUploadStorage();
 
-      const bundleUpload = await this.storage.uploadBundle({
+      const bundleUpload = await bundleStorage.uploadBundle({
         metadata,
         files: options.files,
         ...(options.bundle ?? {}),
@@ -286,20 +319,7 @@ export class SdkClient {
   }
 
   async listDatasets(options?: ListDatasetsOptions): Promise<ListDatasetsResult> {
-    const qs = toQueryString({
-      search: options?.search,
-      owner: options?.owner,
-      dataType: options?.dataType,
-      status: options?.status,
-      isPublic: options?.isPublic,
-      visibility: options?.visibility,
-      from: options?.from,
-      to: options?.to,
-      tags: options?.tags,
-      limit: options?.limit,
-      cursor: options?.cursor,
-      sort: options?.sort,
-    });
+    const qs = toQueryString(this.buildDatasetQuery(options));
     return this.transport.request("GET", `/datasets${qs}`);
   }
 
@@ -322,20 +342,13 @@ export class SdkClient {
     };
 
     while (pagesFetched < maxPages && items.length < maxItems) {
-      const qs = toQueryString({
-        search: options?.search,
-        owner: options?.owner,
-        dataType: options?.dataType,
-        status: options?.status,
-        isPublic: options?.isPublic,
-        visibility: options?.visibility,
-        from: options?.from,
-        to: options?.to,
-        tags: options?.tags,
-        limit: Math.min(pageSize, maxItems - items.length),
-        cursor,
-        sort: options?.sort,
-      });
+      const qs = toQueryString(
+        this.buildDatasetCollectionQuery(
+          options,
+          cursor,
+          Math.min(pageSize, maxItems - items.length),
+        ),
+      );
 
       const result = await this.transport.request<ListDatasetsResult>("GET", `/datasets${qs}`, {
         signal: options?.abortSignal,
@@ -377,20 +390,7 @@ export class SdkClient {
 
     while (pagesFetched < maxPages && itemsFetched < maxItems) {
       const limit = Math.min(pageSize, maxItems - itemsFetched);
-      const qs = toQueryString({
-        search: options?.search,
-        owner: options?.owner,
-        dataType: options?.dataType,
-        status: options?.status,
-        isPublic: options?.isPublic,
-        visibility: options?.visibility,
-        from: options?.from,
-        to: options?.to,
-        tags: options?.tags,
-        limit,
-        cursor,
-        sort: options?.sort,
-      });
+      const qs = toQueryString(this.buildDatasetCollectionQuery(options, cursor, limit));
 
       const result = await this.transport.request<ListDatasetsResult>("GET", `/datasets${qs}`, {
         signal: options?.abortSignal,
@@ -428,20 +428,7 @@ export class SdkClient {
   }
 
   async listDatasetsCsv(options?: ListDatasetsOptions): Promise<string> {
-    const qs = toQueryString({
-      search: options?.search,
-      owner: options?.owner,
-      dataType: options?.dataType,
-      status: options?.status,
-      isPublic: options?.isPublic,
-      visibility: options?.visibility,
-      from: options?.from,
-      to: options?.to,
-      tags: options?.tags,
-      limit: options?.limit,
-      cursor: options?.cursor,
-      sort: options?.sort,
-    });
+    const qs = toQueryString(this.buildDatasetQuery(options));
     return this.transport.request("GET", `/datasets.csv${qs}`);
   }
 
@@ -456,35 +443,15 @@ export class SdkClient {
   async listDatasetsGeoJson(
     options?: ListDatasetsOptions,
   ): Promise<DatasetsGeoJsonFeatureCollection> {
-    const qs = toQueryString({
-      search: options?.search,
-      owner: options?.owner,
-      dataType: options?.dataType,
-      status: options?.status,
-      isPublic: options?.isPublic,
-      visibility: options?.visibility,
-      from: options?.from,
-      to: options?.to,
-      tags: options?.tags,
-      limit: options?.limit,
-      cursor: options?.cursor,
-      sort: options?.sort,
-    });
+    const qs = toQueryString(this.buildDatasetQuery(options));
     return this.transport.request("GET", `/datasets.geojson${qs}`);
   }
 
   async listTags(options?: ListDatasetsOptions): Promise<ListTagsResult> {
     const qs = toQueryString({
-      search: options?.search,
-      owner: options?.owner,
-      dataType: options?.dataType,
-      status: options?.status,
-      isPublic: options?.isPublic,
-      visibility: options?.visibility,
-      from: options?.from,
-      to: options?.to,
-      tags: options?.tags,
-      sort: options?.sort,
+      ...this.buildDatasetQuery(options),
+      limit: undefined,
+      cursor: undefined,
     });
 
     return this.transport.request("GET", `/tags${qs}`);
@@ -492,16 +459,9 @@ export class SdkClient {
 
   async getSummary(options?: ListDatasetsOptions): Promise<SummaryResult> {
     const qs = toQueryString({
-      search: options?.search,
-      owner: options?.owner,
-      dataType: options?.dataType,
-      status: options?.status,
-      isPublic: options?.isPublic,
-      visibility: options?.visibility,
-      from: options?.from,
-      to: options?.to,
-      tags: options?.tags,
-      sort: options?.sort,
+      ...this.buildDatasetQuery(options),
+      limit: undefined,
+      cursor: undefined,
     });
 
     return this.transport.request("GET", `/summary${qs}`);
