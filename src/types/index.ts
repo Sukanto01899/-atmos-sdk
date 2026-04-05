@@ -285,6 +285,18 @@ export interface AuthProvider {
   getAccessToken: () => Promise<string>;
 }
 
+export interface SdkClientCacheOptions {
+  /**
+   * Cache TTL in milliseconds. Set to 0 (default) to disable caching.
+   * In-flight de-duping still applies even when TTL is 0.
+   */
+  maxAgeMs?: number;
+  /**
+   * Maximum cache entries to keep per client instance (default: 500).
+   */
+  maxEntries?: number;
+}
+
 export interface Transport {
   request: <T>(
     method: "GET" | "POST" | "PUT" | "DELETE",
@@ -361,6 +373,7 @@ export interface PublishResult {
 export interface SdkClientOptions {
   baseUrl: string;
   auth?: AuthProvider;
+  cache?: SdkClientCacheOptions;
   transport?: Transport;
   storage?: StorageAdapter;
   registry?: RegistryAdapter;

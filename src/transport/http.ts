@@ -18,7 +18,9 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
         ? toQueryString(req.body as Record<string, string | number | boolean | undefined>)
         : "";
 
-    const url = `${options.baseUrl}${path}${query}`;
+    const baseUrl = `${options.baseUrl}${path}`;
+    const url =
+      query && baseUrl.includes("?") ? `${baseUrl}&${query.slice(1)}` : `${baseUrl}${query}`;
     const hasJsonBody = !isQueryBodyMethod && req?.body !== undefined;
     const headers: Record<string, string> = {
       ...(hasJsonBody ? { "content-type": "application/json" } : {}),

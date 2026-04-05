@@ -33,6 +33,7 @@ export type {
   PublishResult,
   PublishTarget,
   RegistryAdapter,
+  SdkClientCacheOptions,
   SdkClientOptions,
   StorageAdapter,
   UploadOptions,

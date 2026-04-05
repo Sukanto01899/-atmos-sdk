@@ -50,12 +50,52 @@ export class SdkClient {
   private readonly storage?: StorageAdapter;
   private readonly registry?: RegistryAdapter;
   private readonly onchain?: OnChainPublisher;
+  private readonly cacheOptions;
+  private readonly metadataCache = new Map<string, { value: DatasetMetadata; expiresAt: number }>();
+  private readonly metadataInFlight = new Map<string, Promise<DatasetMetadata>>();
 
   constructor(options: SdkClientOptions) {
     this.transport = options.transport ?? httpTransport(options);
     this.storage = options.storage;
     this.registry = options.registry;
     this.onchain = options.onchain;
+    this.cacheOptions = options.cache;
+  }
+
+  private getCacheMaxAgeMs() {
+    return Math.max(0, this.cacheOptions?.maxAgeMs ?? 0);
+  }
+
+  private getCacheMaxEntries() {
+    return Math.max(1, this.cacheOptions?.maxEntries ?? 500);
+  }
+
+  private getCachedMetadata(id: DatasetId) {
+    const key = String(id);
+    const entry = this.metadataCache.get(key);
+    if (!entry) return null;
+    if (Date.now() >= entry.expiresAt) {
+      this.metadataCache.delete(key);
+      return null;
+    }
+    return entry.value;
+  }
+
+  private setCachedMetadata(id: DatasetId, value: DatasetMetadata) {
+    const maxAgeMs = this.getCacheMaxAgeMs();
+    if (maxAgeMs <= 0) return;
+
+    const key = String(id);
+    // Bump insertion order for LRU-ish behavior.
+    this.metadataCache.delete(key);
+    this.metadataCache.set(key, { value, expiresAt: Date.now() + maxAgeMs });
+
+    const maxEntries = this.getCacheMaxEntries();
+    while (this.metadataCache.size > maxEntries) {
+      const firstKey = this.metadataCache.keys().next().value as string | undefined;
+      if (!firstKey) break;
+      this.metadataCache.delete(firstKey);
+    }
   }
 
   private getStorage(): StorageAdapter {
@@ -289,7 +329,29 @@ export class SdkClient {
   }
 
   async getMetadata(id: DatasetId): Promise<DatasetMetadata> {
-    return this.transport.request("GET", `/datasets/${id}`);
+    const cached = this.getCachedMetadata(id);
+    if (cached) {
+      return cached;
+    }
+
+    const key = String(id);
+    const existing = this.metadataInFlight.get(key);
+    if (existing) {
+      return existing;
+    }
+
+    const promise = this.transport
+      .request<DatasetMetadata>("GET", `/datasets/${id}`)
+      .then((value) => {
+        this.setCachedMetadata(id, value);
+        return value;
+      })
+      .finally(() => {
+        this.metadataInFlight.delete(key);
+      });
+
+    this.metadataInFlight.set(key, promise);
+    return promise;
   }
 
   async getDatasetIpfsGatewayUrl(
