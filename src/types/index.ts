@@ -1,6 +1,13 @@
 export type DatasetId = string;
 export type DatasetStatus = "active" | "verified" | "pending" | "rejected" | "deprecated";
 
+export interface Bbox {
+  minLon: number;
+  minLat: number;
+  maxLon: number;
+  maxLat: number;
+}
+
 export interface DatasetMetadata {
   id?: DatasetId;
   name: string;
@@ -181,7 +188,7 @@ export interface ListDatasetsOptions {
   isPublic?: boolean;
   verified?: boolean;
   metadataFrozen?: boolean;
-  bbox?: string | [number, number, number, number];
+  bbox?: string | [number, number, number, number] | Bbox;
   altitudeMin?: number;
   altitudeMax?: number;
   from?: number;

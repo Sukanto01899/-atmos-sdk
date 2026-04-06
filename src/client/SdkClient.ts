@@ -35,6 +35,7 @@ import type {
   VerifyOptions,
   VerifyResult,
   VerifyBundleResult,
+  Bbox,
 } from "../types";
 import { httpTransport } from "../transport/http";
 import { SdkError } from "../types";
@@ -143,12 +144,42 @@ export class SdkClient {
       const normalized = bbox.trim();
       return normalized ? normalized : undefined;
     }
-    if (Array.isArray(bbox) && bbox.length === 4) {
-      return bbox.map((value) => String(value)).join(",");
+
+    const asNumbers = (values: unknown[]) => {
+      if (values.length !== 4) return null;
+      const nums = values.map((value) => Number(value));
+      if (nums.some((value) => !Number.isFinite(value))) return null;
+      return nums as [number, number, number, number];
+    };
+
+    if (Array.isArray(bbox)) {
+      const nums = asNumbers(bbox);
+      if (!nums) {
+        throw new SdkError(
+          "E_VALIDATION",
+          "Invalid bbox tuple. Expected [minLon, minLat, maxLon, maxLat] numbers.",
+          0,
+          bbox,
+        );
+      }
+      return nums.map((value) => String(value)).join(",");
+    }
+    if (typeof bbox === "object") {
+      const record = bbox as Partial<Bbox>;
+      const nums = asNumbers([record.minLon, record.minLat, record.maxLon, record.maxLat]);
+      if (!nums) {
+        throw new SdkError(
+          "E_VALIDATION",
+          "Invalid bbox object. Expected { minLon, minLat, maxLon, maxLat } numbers.",
+          0,
+          bbox,
+        );
+      }
+      return nums.map((value) => String(value)).join(",");
     }
     throw new SdkError(
       "E_VALIDATION",
-      "Invalid bbox. Expected string 'minLon,minLat,maxLon,maxLat' or a 4-item tuple.",
+      "Invalid bbox. Expected string, tuple, or { minLon, minLat, maxLon, maxLat }.",
       0,
       bbox,
     );

@@ -5,6 +5,7 @@ export type {
   BatchProgress,
   BatchResult,
   BundleUploadFile,
+  Bbox,
   DatasetId,
   DatasetMetadata,
   DatasetStatus,

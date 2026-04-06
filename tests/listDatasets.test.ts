@@ -18,6 +18,13 @@ describe("listDatasets()", () => {
       owner: "SP123",
       status: "verified",
       isPublic: true,
+      verified: true,
+      metadataFrozen: false,
+      bbox: { minLon: 90, minLat: 23, maxLon: 91, maxLat: 24 },
+      altitudeMin: 100,
+      altitudeMax: 5000,
+      createdAtFrom: 870000,
+      createdAtTo: 880000,
       limit: 10,
       cursor: "abc",
     });
@@ -26,7 +33,7 @@ describe("listDatasets()", () => {
     const [method, path, options] = request.mock.calls[0];
     expect(method).toBe("GET");
     expect(path).toBe(
-      "/datasets?search=wind&owner=SP123&status=verified&isPublic=true&limit=10&cursor=abc",
+      "/datasets?search=wind&owner=SP123&status=verified&isPublic=true&verified=true&metadataFrozen=false&bbox=90%2C23%2C91%2C24&altitudeMin=100&altitudeMax=5000&createdAtFrom=870000&createdAtTo=880000&limit=10&cursor=abc",
     );
     expect(options).toBeUndefined();
   });
