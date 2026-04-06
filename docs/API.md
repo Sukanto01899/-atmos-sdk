@@ -42,6 +42,7 @@ const data = await client.download(id);
 - `getMetadata(id)`
 - `listDatasets(options?)` (sent as query params; supports `limit`, `cursor`, and `sort`)
   - `tags` is sent as a comma-separated list (example: `tags=wind,hourly`)
+  - supports geo/altitude + status filters when the API supports them: `bbox`, `altitudeMin`, `altitudeMax`, `verified`, `metadataFrozen`, `createdAtFrom`, `createdAtTo`
 - `listTags(options?)` (returns tag counts for the same filter options)
 
 ## Storage Adapters

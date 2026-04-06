@@ -179,8 +179,15 @@ export interface ListDatasetsOptions {
   dataType?: string;
   status?: DatasetStatus;
   isPublic?: boolean;
+  verified?: boolean;
+  metadataFrozen?: boolean;
+  bbox?: string | [number, number, number, number];
+  altitudeMin?: number;
+  altitudeMax?: number;
   from?: number;
   to?: number;
+  createdAtFrom?: number;
+  createdAtTo?: number;
   tags?: string[];
   limit?: number;
   cursor?: string;

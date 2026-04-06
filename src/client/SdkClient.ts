@@ -137,6 +137,23 @@ export class SdkClient {
     return storage as Required<Pick<StorageAdapter, "verifyBundle">> & StorageAdapter;
   }
 
+  private normalizeBboxParam(bbox: ListDatasetsOptions["bbox"]): string | undefined {
+    if (bbox === undefined || bbox === null) return undefined;
+    if (typeof bbox === "string") {
+      const normalized = bbox.trim();
+      return normalized ? normalized : undefined;
+    }
+    if (Array.isArray(bbox) && bbox.length === 4) {
+      return bbox.map((value) => String(value)).join(",");
+    }
+    throw new SdkError(
+      "E_VALIDATION",
+      "Invalid bbox. Expected string 'minLon,minLat,maxLon,maxLat' or a 4-item tuple.",
+      0,
+      bbox,
+    );
+  }
+
   private buildDatasetQuery(options?: ListDatasetsOptions) {
     return {
       search: options?.search,
@@ -144,9 +161,16 @@ export class SdkClient {
       dataType: options?.dataType,
       status: options?.status,
       isPublic: options?.isPublic,
+      verified: options?.verified,
+      metadataFrozen: options?.metadataFrozen,
+      bbox: this.normalizeBboxParam(options?.bbox),
+      altitudeMin: options?.altitudeMin,
+      altitudeMax: options?.altitudeMax,
       visibility: options?.visibility,
       from: options?.from,
       to: options?.to,
+      createdAtFrom: options?.createdAtFrom,
+      createdAtTo: options?.createdAtTo,
       tags: options?.tags,
       limit: options?.limit,
       cursor: options?.cursor,
@@ -165,9 +189,16 @@ export class SdkClient {
       dataType: options?.dataType,
       status: options?.status,
       isPublic: options?.isPublic,
+      verified: options?.verified,
+      metadataFrozen: options?.metadataFrozen,
+      bbox: this.normalizeBboxParam(options?.bbox),
+      altitudeMin: options?.altitudeMin,
+      altitudeMax: options?.altitudeMax,
       visibility: options?.visibility,
       from: options?.from,
       to: options?.to,
+      createdAtFrom: options?.createdAtFrom,
+      createdAtTo: options?.createdAtTo,
       tags: options?.tags,
       limit,
       cursor,
