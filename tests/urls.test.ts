@@ -1,0 +1,22 @@
+import { describe, expect, test } from "vitest";
+import { SdkClient } from "../src/client/SdkClient";
+import type { Transport } from "../src/types";
+
+describe("URL helpers", () => {
+  test("builds datasets + export URLs from baseUrl", () => {
+    const transport: Transport = { request: async () => ({}) };
+    const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
+
+    expect(client.getDatasetUrl(123)).toBe("https://api.atmos.example/datasets/123");
+    expect(client.getDatasetsUrl({ search: "wind" })).toBe(
+      "https://api.atmos.example/datasets?search=wind",
+    );
+    expect(client.getDatasetsCsvUrl({ tags: ["wind", "hourly"] })).toBe(
+      "https://api.atmos.example/datasets.csv?tags=wind%2Chourly",
+    );
+    expect(client.getDatasetsGeoJsonUrl({ bbox: [90, 23, 91, 24] })).toBe(
+      "https://api.atmos.example/datasets.geojson?bbox=90%2C23%2C91%2C24",
+    );
+  });
+});
+

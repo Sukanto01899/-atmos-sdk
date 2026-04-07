@@ -47,6 +47,7 @@ import { toIpfsGatewayUrl } from "../utils/ipfs";
 import { toStacksExplorerAddressUrl } from "../utils/stacksExplorer";
 
 export class SdkClient {
+  private readonly baseUrl;
   private readonly transport;
   private readonly storage?: StorageAdapter;
   private readonly registry?: RegistryAdapter;
@@ -56,11 +57,20 @@ export class SdkClient {
   private readonly metadataInFlight = new Map<string, Promise<DatasetMetadata>>();
 
   constructor(options: SdkClientOptions) {
+    this.baseUrl = String(options.baseUrl ?? "").replace(/\/+$/, "");
     this.transport = options.transport ?? httpTransport(options);
     this.storage = options.storage;
     this.registry = options.registry;
     this.onchain = options.onchain;
     this.cacheOptions = options.cache;
+  }
+
+  private buildAbsoluteUrl(path: string) {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    if (!this.baseUrl) {
+      throw new SdkError("E_VALIDATION", "Missing baseUrl.");
+    }
+    return `${this.baseUrl}${normalizedPath}`;
   }
 
   private getCacheMaxAgeMs() {
@@ -445,6 +455,25 @@ export class SdkClient {
   async listDatasets(options?: ListDatasetsOptions): Promise<ListDatasetsResult> {
     const qs = toQueryString(this.buildDatasetQuery(options));
     return this.transport.request("GET", `/datasets${qs}`);
+  }
+
+  getDatasetUrl(id: DatasetId): string {
+    return this.buildAbsoluteUrl(`/datasets/${id}`);
+  }
+
+  getDatasetsUrl(options?: ListDatasetsOptions): string {
+    const qs = toQueryString(this.buildDatasetQuery(options));
+    return this.buildAbsoluteUrl(`/datasets${qs}`);
+  }
+
+  getDatasetsCsvUrl(options?: ListDatasetsOptions): string {
+    const qs = toQueryString(this.buildDatasetQuery(options));
+    return this.buildAbsoluteUrl(`/datasets.csv${qs}`);
+  }
+
+  getDatasetsGeoJsonUrl(options?: ListDatasetsOptions): string {
+    const qs = toQueryString(this.buildDatasetQuery(options));
+    return this.buildAbsoluteUrl(`/datasets.geojson${qs}`);
   }
 
   async listDatasetsAll(options?: ListDatasetsAllOptions): Promise<ListDatasetsAllResult> {
