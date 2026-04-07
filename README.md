@@ -12,13 +12,13 @@ TypeScript SDK for uploading, downloading, verifying, and previewing datasets.
 ## Install
 
 ```bash
-npm install @atmos/sdk
+npm install @sukanto01899/atmos-sdk
 ```
 
 ## Quick start
 
 ```ts
-import { SdkClient, createIpfsAdapter } from "@atmos/sdk";
+import { SdkClient, createIpfsAdapter } from "@sukanto01899/atmos-sdk";
 
 const client = new SdkClient({
   baseUrl: "https://api.atmos.example",
@@ -167,7 +167,7 @@ import {
   httpTransport,
   createHttpRegistry,
   createStacksOnChainPublisher,
-} from "@atmos/sdk";
+} from "@sukanto01899/atmos-sdk";
 
 const baseUrl = "https://api.atmos.example";
 const transport = httpTransport({ baseUrl });
@@ -226,7 +226,7 @@ const client = new SdkClient({
 ### IPFS
 
 ```ts
-import { createIpfsAdapter } from "@atmos/sdk";
+import { createIpfsAdapter } from "@sukanto01899/atmos-sdk";
 
 const storage = createIpfsAdapter({
   endpoint: "https://ipfs.example",
@@ -244,7 +244,7 @@ const storage = createIpfsAdapter({
 ### S3
 
 ```ts
-import { createS3Adapter } from "@atmos/sdk";
+import { createS3Adapter } from "@sukanto01899/atmos-sdk";
 
 const storage = createS3Adapter({
   bucket: "atmos-datasets",
@@ -257,7 +257,7 @@ const storage = createS3Adapter({
 All SDK errors throw `SdkError` with `code`, `message`, and optional `status`.
 
 ```ts
-import { SdkError } from "@atmos/sdk";
+import { SdkError } from "@sukanto01899/atmos-sdk";
 
 try {
   await client.download("bad-id");
@@ -276,3 +276,4 @@ try {
 ## API reference
 
 See `docs/API.md` for the full API surface.
+

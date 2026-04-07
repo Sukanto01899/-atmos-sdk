@@ -3,7 +3,7 @@
 ## Client
 
 ```ts
-import { SdkClient } from "@atmos/sdk";
+import { SdkClient } from "@sukanto01899/atmos-sdk";
 
 const client = new SdkClient({
   baseUrl: "https://api.atmos.example",
@@ -92,3 +92,4 @@ await client.upload(file, {
 - `parseCsvWithHeader(text, maxRows)`
 - `inferSchema(rows, options?)`
 ```
+
