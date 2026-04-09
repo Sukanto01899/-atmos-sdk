@@ -394,14 +394,19 @@ export interface SdkClientOptions {
   onchain?: OnChainPublisher;
 }
 
+// Used to detect SdkError instances across duplicated installs / realms where `instanceof` may fail.
+export const SDK_ERROR_BRAND = Symbol.for("@atmosstacks/atmos-sdk/SdkError");
+
 export class SdkError extends Error {
   code: string;
   status?: number;
   details?: unknown;
   constructor(code: string, message: string, status?: number, details?: unknown) {
     super(message);
+    this.name = "SdkError";
     this.code = code;
     this.status = status;
     this.details = details;
+    Object.defineProperty(this, SDK_ERROR_BRAND, { value: true });
   }
 }
