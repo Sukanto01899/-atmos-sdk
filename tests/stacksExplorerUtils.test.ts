@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { toStacksExplorerAddressUrl, toStacksExplorerTxUrl } from "../src/utils/stacksExplorer";
+import {
+  toStacksExplorerAddressUrl,
+  toStacksExplorerContractUrl,
+  toStacksExplorerTxUrl,
+} from "../src/utils/stacksExplorer";
 
 describe("stacks explorer utils", () => {
   test("returns null for empty input", () => {
@@ -21,5 +25,10 @@ describe("stacks explorer utils", () => {
       }),
     ).toBe("https://explorer.hiro.so/txid/0xabc?chain=testnet");
   });
-});
 
+  test("builds contract url via contract principal", () => {
+    expect(toStacksExplorerContractUrl("SP123", "atmos-v4")).toBe(
+      "https://explorer.hiro.so/address/SP123.atmos-v4?chain=mainnet",
+    );
+  });
+});

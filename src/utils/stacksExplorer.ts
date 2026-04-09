@@ -1,4 +1,5 @@
 export type StacksChain = "mainnet" | "testnet";
+export type StacksExplorerOptions = { chain?: StacksChain; baseUrl?: string };
 
 const normalizeBase = (base: string) => {
   const trimmed = (base ?? "").trim();
@@ -10,7 +11,7 @@ const normalizeBase = (base: string) => {
 
 export const toStacksExplorerAddressUrl = (
   addressOrContract: string,
-  options?: { chain?: StacksChain; baseUrl?: string },
+  options?: StacksExplorerOptions,
 ): string | null => {
   const value = (addressOrContract ?? "").trim();
   if (!value) return null;
@@ -21,7 +22,7 @@ export const toStacksExplorerAddressUrl = (
 
 export const toStacksExplorerTxUrl = (
   txId: string,
-  options?: { chain?: StacksChain; baseUrl?: string },
+  options?: StacksExplorerOptions,
 ): string | null => {
   const value = (txId ?? "").trim();
   if (!value) return null;
@@ -30,3 +31,14 @@ export const toStacksExplorerTxUrl = (
   return `${baseUrl}/txid/${encodeURIComponent(value)}?chain=${encodeURIComponent(chain)}`;
 };
 
+export const toStacksExplorerContractUrl = (
+  contractAddress: string,
+  contractName: string,
+  options?: StacksExplorerOptions,
+): string | null => {
+  const addr = (contractAddress ?? "").trim();
+  const name = (contractName ?? "").trim();
+  if (!addr || !name) return null;
+  // Hiro Explorer accepts contract principals via the `/address/<principal>` route.
+  return toStacksExplorerAddressUrl(`${addr}.${name}`, options);
+};
