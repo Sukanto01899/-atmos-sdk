@@ -71,5 +71,29 @@ describe("getMetadata() caching", () => {
       vi.useRealTimers();
     }
   });
-});
 
+  test("supports manual cache invalidation", async () => {
+    const request = vi.fn(async (_method: string, path: string) => {
+      const match = path.match(/^\/datasets\/(.+)$/);
+      if (!match) throw new Error("unexpected path");
+      return buildMetadata(match[1]);
+    });
+    const transport: Transport = { request };
+
+    const client = new SdkClient({
+      baseUrl: "https://api.atmos.example",
+      transport,
+      cache: { maxAgeMs: 10_000 },
+      storage: undefined,
+    });
+
+    await client.getMetadata("3");
+    await client.getMetadata("3");
+    expect(request).toHaveBeenCalledTimes(1);
+
+    client.invalidateMetadataCache("3");
+
+    await client.getMetadata("3");
+    expect(request).toHaveBeenCalledTimes(2);
+  });
+});

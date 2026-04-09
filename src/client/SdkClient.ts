@@ -65,6 +65,14 @@ export class SdkClient {
     this.cacheOptions = options.cache;
   }
 
+  clearMetadataCache(): void {
+    this.metadataCache.clear();
+  }
+
+  invalidateMetadataCache(id: DatasetId): void {
+    this.metadataCache.delete(String(id));
+  }
+
   private buildAbsoluteUrl(path: string) {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
     if (!this.baseUrl) {
