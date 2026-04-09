@@ -32,12 +32,17 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
       headers.authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: hasJsonBody ? JSON.stringify(req.body) : undefined,
-      signal: req?.signal,
-    });
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method,
+        headers,
+        body: hasJsonBody ? JSON.stringify(req.body) : undefined,
+        signal: req?.signal,
+      });
+    } catch (error: unknown) {
+      throw new SdkError("E_HTTP", "Network request failed.", 0, { url, error });
+    }
 
     if (!response.ok) {
       const text = await response.text();

@@ -1,5 +1,6 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { httpTransport } from "../src/transport/http";
+import { SdkError } from "../src/types";
 
 describe("httpTransport", () => {
   const originalFetch = globalThis.fetch;
@@ -42,5 +43,18 @@ describe("httpTransport", () => {
     const result = await transport.request<string>("GET", "/health");
     expect(result).toBe("ok");
   });
-});
 
+  test("wraps fetch failures in SdkError", async () => {
+    globalThis.fetch = vi.fn(async () => {
+      throw new TypeError("network down");
+    }) as unknown as typeof fetch;
+
+    const transport = httpTransport({ baseUrl: "http://127.0.0.1:4000" });
+
+    await expect(transport.request("GET", "/health")).rejects.toMatchObject({
+      name: "SdkError",
+      code: "E_HTTP",
+      status: 0,
+    } satisfies Partial<SdkError>);
+  });
+});
