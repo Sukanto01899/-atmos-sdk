@@ -2,6 +2,9 @@ import type { SdkClientOptions, Transport } from "../types";
 import { SdkError } from "../types";
 import { toQueryString } from "../utils/query";
 
+const normalizeBaseUrl = (baseUrl: string) => String(baseUrl ?? "").replace(/\/+$/, "");
+const normalizePath = (path: string) => (path.startsWith("/") ? path : `/${path}`);
+
 export const httpTransport = (options: SdkClientOptions): Transport => ({
   async request<T>(
     method: "GET" | "POST" | "PUT" | "DELETE",
@@ -18,7 +21,7 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
         ? toQueryString(req.body as Record<string, string | number | boolean | undefined>)
         : "";
 
-    const baseUrl = `${options.baseUrl}${path}`;
+    const baseUrl = `${normalizeBaseUrl(options.baseUrl)}${normalizePath(path)}`;
     const url =
       query && baseUrl.includes("?") ? `${baseUrl}&${query.slice(1)}` : `${baseUrl}${query}`;
     const hasJsonBody = !isQueryBodyMethod && req?.body !== undefined;

@@ -44,6 +44,19 @@ describe("httpTransport", () => {
     expect(result).toBe("ok");
   });
 
+  test("normalizes baseUrl and path when joining", async () => {
+    globalThis.fetch = vi.fn(async (url) => {
+      expect(String(url)).toBe("http://127.0.0.1:4000/datasets?limit=1");
+      return new Response(JSON.stringify({ items: [], nextCursor: undefined }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }) as unknown as typeof fetch;
+
+    const transport = httpTransport({ baseUrl: "http://127.0.0.1:4000/" });
+    await transport.request("GET", "datasets", { body: { limit: 1 } });
+  });
+
   test("wraps fetch failures in SdkError", async () => {
     globalThis.fetch = vi.fn(async () => {
       throw new TypeError("network down");
