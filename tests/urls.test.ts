@@ -18,5 +18,17 @@ describe("URL helpers", () => {
       "https://api.atmos.example/datasets.geojson?bbox=90%2C23%2C91%2C24",
     );
   });
-});
 
+  test("builds health/tags/summary URLs", () => {
+    const transport: Transport = { request: async () => ({}) };
+    const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
+
+    expect(client.getHealthUrl()).toBe("https://api.atmos.example/health");
+    expect(client.getTagsUrl({ search: "wind", limit: 25, cursor: "abc" })).toBe(
+      "https://api.atmos.example/tags?search=wind",
+    );
+    expect(client.getSummaryUrl({ visibility: "public", tags: ["wind"] })).toBe(
+      "https://api.atmos.example/summary?visibility=public&tags=wind",
+    );
+  });
+});

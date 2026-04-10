@@ -484,6 +484,28 @@ export class SdkClient {
     return this.buildAbsoluteUrl(`/datasets.geojson${qs}`);
   }
 
+  getHealthUrl(): string {
+    return this.buildAbsoluteUrl("/health");
+  }
+
+  getTagsUrl(options?: ListDatasetsOptions): string {
+    const qs = toQueryString({
+      ...this.buildDatasetQuery(options),
+      limit: undefined,
+      cursor: undefined,
+    });
+    return this.buildAbsoluteUrl(`/tags${qs}`);
+  }
+
+  getSummaryUrl(options?: ListDatasetsOptions): string {
+    const qs = toQueryString({
+      ...this.buildDatasetQuery(options),
+      limit: undefined,
+      cursor: undefined,
+    });
+    return this.buildAbsoluteUrl(`/summary${qs}`);
+  }
+
   async listDatasetsAll(options?: ListDatasetsAllOptions): Promise<ListDatasetsAllResult> {
     const pageSize = options?.limit ?? 50;
     const maxPages = Math.max(1, options?.maxPages ?? 50);
