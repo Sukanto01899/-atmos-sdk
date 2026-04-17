@@ -72,6 +72,11 @@ export {
   toStacksExplorerTxUrl,
 } from "./utils/stacksExplorer";
 export {
+  toOpenStreetMapUrl,
+  toOpenStreetMapUrlFromMicroDegrees,
+} from "./utils/openStreetMap";
+export type { OpenStreetMapOptions } from "./utils/openStreetMap";
+export {
   computeSha256AndSize,
   readToArrayBuffer,
   sha256HexFromArrayBuffer,
