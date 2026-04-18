@@ -44,6 +44,7 @@ import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
 import { toIpfsGatewayUrl } from "../utils/ipfs";
+import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
 import { toStacksExplorerAddressUrl } from "../utils/stacksExplorer";
 
 export class SdkClient {
@@ -448,6 +449,14 @@ export class SdkClient {
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
     return toStacksExplorerAddressUrl(metadata.owner ?? "", options);
+  }
+
+  async getDatasetOpenStreetMapUrl(
+    id: DatasetId,
+    options?: OpenStreetMapOptions,
+  ): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    return toOpenStreetMapUrl(metadata.latitude, metadata.longitude, options);
   }
 
   async getMetadataBatch(
