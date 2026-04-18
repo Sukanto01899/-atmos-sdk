@@ -1,6 +1,7 @@
 import type { DatasetMetadata, OnChainPublisher } from "../types";
 import { SdkError } from "../types";
 import { boolCV, intCV, stringAsciiCV, stringUtf8CV, uintCV } from "@stacks/transactions";
+import { toMicroDegrees } from "../utils/coords";
 
 export interface StacksRegisterDatasetTx {
   contractAddress: string;
@@ -14,8 +15,6 @@ export interface StacksOnChainPublisherOptions {
   contractName: string;
 }
 
-const toMicroDegrees = (degrees: number) => Math.round(degrees * 1_000_000);
-
 export const createStacksOnChainPublisher = (
   options: StacksOnChainPublisherOptions,
 ): OnChainPublisher => {
@@ -26,7 +25,13 @@ export const createStacksOnChainPublisher = (
       }
 
       const latitude = toMicroDegrees(metadata.latitude);
+      if (latitude === null) {
+        throw new SdkError("E_ONCHAIN", "metadata.latitude must be a finite number (degrees).");
+      }
       const longitude = toMicroDegrees(metadata.longitude);
+      if (longitude === null) {
+        throw new SdkError("E_ONCHAIN", "metadata.longitude must be a finite number (degrees).");
+      }
 
       return {
         contractAddress: options.contractAddress,
@@ -48,4 +53,3 @@ export const createStacksOnChainPublisher = (
     },
   };
 };
-

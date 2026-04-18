@@ -76,6 +76,7 @@ export {
   toOpenStreetMapUrlFromMicroDegrees,
 } from "./utils/openStreetMap";
 export type { OpenStreetMapOptions } from "./utils/openStreetMap";
+export { toMicroDegrees, fromMicroDegrees } from "./utils/coords";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
