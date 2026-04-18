@@ -3,6 +3,7 @@ import type {
   BatchResult,
   DatasetId,
   DatasetMetadata,
+  DatasetsGeoJsonFeature,
   DatasetBundleManifest,
   DownloadOptions,
   DownloadResult,
@@ -457,6 +458,36 @@ export class SdkClient {
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
     return toOpenStreetMapUrl(metadata.latitude, metadata.longitude, options);
+  }
+
+  async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
+    const metadata = await this.getMetadata(id);
+    if (!Number.isFinite(metadata.latitude) || !Number.isFinite(metadata.longitude)) {
+      return null;
+    }
+
+    return {
+      type: "Feature",
+      id: metadata.id ?? id,
+      geometry: {
+        type: "Point",
+        coordinates: [metadata.longitude, metadata.latitude],
+      },
+      properties: {
+        name: metadata.name,
+        description: metadata.description,
+        dataType: metadata.dataType,
+        tags: metadata.tags,
+        status: metadata.status,
+        owner: metadata.owner,
+        isPublic: metadata.isPublic,
+        collectionDate: metadata.collectionDate,
+        createdAt: metadata.createdAt,
+        altitudeMin: metadata.altitudeMin,
+        altitudeMax: metadata.altitudeMax,
+        ipfsHash: metadata.ipfsHash,
+      },
+    };
   }
 
   async getMetadataBatch(
