@@ -76,6 +76,11 @@ export {
   toOpenStreetMapUrlFromMicroDegrees,
 } from "./utils/openStreetMap";
 export type { OpenStreetMapOptions } from "./utils/openStreetMap";
+export {
+  toGoogleMapsUrl,
+  toGoogleMapsUrlFromMicroDegrees,
+} from "./utils/googleMaps";
+export type { GoogleMapsOptions } from "./utils/googleMaps";
 export { toMicroDegrees, fromMicroDegrees } from "./utils/coords";
 export {
   computeSha256AndSize,
