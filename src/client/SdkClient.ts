@@ -45,6 +45,7 @@ import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
 import { toIpfsGatewayUrl } from "../utils/ipfs";
+import { toMicroDegrees } from "../utils/coords";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
 import { toStacksExplorerAddressUrl } from "../utils/stacksExplorer";
@@ -467,6 +468,18 @@ export class SdkClient {
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
     return toGoogleMapsUrl(metadata.latitude, metadata.longitude, options);
+  }
+
+  async getDatasetCoordinatesMicroDegrees(
+    id: DatasetId,
+  ): Promise<{ latitude: number; longitude: number } | null> {
+    const metadata = await this.getMetadata(id);
+    const latitude = toMicroDegrees(metadata.latitude);
+    const longitude = toMicroDegrees(metadata.longitude);
+    if (latitude === null || longitude === null) {
+      return null;
+    }
+    return { latitude, longitude };
   }
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
