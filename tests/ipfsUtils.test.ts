@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { normalizeIpfsCid, toIpfsGatewayUrl } from "../src/utils/ipfs";
+import { normalizeIpfsCid, toIpfsGatewayUrl, toIpfsUri } from "../src/utils/ipfs";
 
 describe("ipfs utils", () => {
   test("normalizeIpfsCid handles raw cid, ipfs://, /ipfs/, and gateway urls", () => {
@@ -30,5 +30,10 @@ describe("ipfs utils", () => {
       "https://cloudflare-ipfs.com/ipfs/QmHash",
     );
   });
-});
 
+  test("toIpfsUri builds an ipfs:// uri", () => {
+    expect(toIpfsUri("QmHash")).toBe("ipfs://QmHash");
+    expect(toIpfsUri("ipfs://QmHash")).toBe("ipfs://QmHash");
+    expect(toIpfsUri("https://ipfs.io/ipfs/QmHash?filename=a.csv")).toBe("ipfs://QmHash");
+  });
+});

@@ -39,3 +39,8 @@ export const toIpfsGatewayUrl = (
   return `${withIpfs}${encodeURIComponent(cid)}`;
 };
 
+export const toIpfsUri = (value: string): string | null => {
+  const cid = normalizeIpfsCid(value);
+  if (!cid) return null;
+  return `ipfs://${cid}`;
+};

@@ -44,7 +44,7 @@ import { runBatch } from "../utils/batch";
 import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
-import { toIpfsGatewayUrl } from "../utils/ipfs";
+import { toIpfsGatewayUrl, toIpfsUri } from "../utils/ipfs";
 import { toMicroDegrees } from "../utils/coords";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
@@ -447,6 +447,11 @@ export class SdkClient {
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
     return toIpfsGatewayUrl(metadata.ipfsHash ?? "", gatewayBase);
+  }
+
+  async getDatasetIpfsUri(id: DatasetId): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    return toIpfsUri(metadata.ipfsHash ?? "");
   }
 
   async getDatasetOwnerExplorerUrl(

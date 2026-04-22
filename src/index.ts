@@ -65,7 +65,7 @@ export type {
 export { withRetry } from "./utils/retry";
 export { isSdkError } from "./utils/errors";
 export { runBatch } from "./utils/batch";
-export { normalizeIpfsCid, toIpfsGatewayUrl } from "./utils/ipfs";
+export { normalizeIpfsCid, toIpfsGatewayUrl, toIpfsUri } from "./utils/ipfs";
 export {
   toStacksExplorerAddressUrl,
   toStacksExplorerContractUrl,
