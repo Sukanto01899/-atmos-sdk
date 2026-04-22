@@ -48,7 +48,10 @@ import { toIpfsGatewayUrl } from "../utils/ipfs";
 import { toMicroDegrees } from "../utils/coords";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
-import { toStacksExplorerAddressUrl } from "../utils/stacksExplorer";
+import {
+  toStacksExplorerAddressUrl,
+  type StacksExplorerOptions,
+} from "../utils/stacksExplorer";
 
 export class SdkClient {
   private readonly baseUrl;
@@ -480,6 +483,69 @@ export class SdkClient {
       return null;
     }
     return { latitude, longitude };
+  }
+
+  async getDatasetSummaryText(
+    id: DatasetId,
+    options?: {
+      includeLinks?: boolean;
+      stacksExplorer?: StacksExplorerOptions;
+      ipfsGatewayBase?: string;
+      openStreetMap?: OpenStreetMapOptions;
+      googleMaps?: GoogleMapsOptions;
+    },
+  ): Promise<string> {
+    const metadata = await this.getMetadata(id);
+    const datasetId = metadata.id ?? id;
+    const includeLinks = options?.includeLinks ?? true;
+
+    const safe = (value: unknown) => String(value ?? "").trim();
+    const coordsOk =
+      Number.isFinite(metadata.latitude) && Number.isFinite(metadata.longitude);
+
+    const lines = [
+      `Dataset #${datasetId}: ${safe(metadata.name)}`,
+      `Type: ${safe(metadata.dataType)}`,
+      metadata.status ? `Status: ${safe(metadata.status)}` : "",
+      `Visibility: ${metadata.isPublic ? "Public" : "Private"}`,
+      metadata.owner ? `Owner: ${safe(metadata.owner)}` : "",
+      `Collection date: ${safe(metadata.collectionDate)}`,
+      typeof metadata.createdAt === "number" ? `Created at: ${safe(metadata.createdAt)}` : "",
+      `Altitude: ${safe(metadata.altitudeMin)}-${safe(metadata.altitudeMax)} m`,
+      coordsOk ? `Coordinates: ${safe(metadata.latitude)}, ${safe(metadata.longitude)} (deg)` : "",
+      metadata.ipfsHash ? `IPFS: ${safe(metadata.ipfsHash)}` : "",
+      safe(metadata.description) ? `Description: ${safe(metadata.description)}` : "",
+    ].filter(Boolean);
+
+    if (!includeLinks) {
+      return lines.join("\n");
+    }
+
+    const ownerUrl = metadata.owner
+      ? toStacksExplorerAddressUrl(metadata.owner, options?.stacksExplorer)
+      : null;
+    const ipfsUrl = metadata.ipfsHash
+      ? toIpfsGatewayUrl(metadata.ipfsHash, options?.ipfsGatewayBase)
+      : null;
+    const osmUrl = coordsOk
+      ? toOpenStreetMapUrl(metadata.latitude, metadata.longitude, options?.openStreetMap)
+      : null;
+    const googleUrl = coordsOk
+      ? toGoogleMapsUrl(metadata.latitude, metadata.longitude, options?.googleMaps)
+      : null;
+
+    const linkLines = [
+      ownerUrl ? `Owner explorer: ${ownerUrl}` : "",
+      ipfsUrl ? `IPFS gateway: ${ipfsUrl}` : "",
+      osmUrl ? `OpenStreetMap: ${osmUrl}` : "",
+      googleUrl ? `Google Maps: ${googleUrl}` : "",
+    ].filter(Boolean);
+
+    if (linkLines.length === 0) {
+      return lines.join("\n");
+    }
+
+    return [...lines, "", ...linkLines].join("\n");
   }
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
