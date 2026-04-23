@@ -526,6 +526,27 @@ export class SdkClient {
     return { latitude, longitude };
   }
 
+  async getDatasetCoordinatesString(
+    id: DatasetId,
+    options?: { precision?: number },
+  ): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    if (!Number.isFinite(metadata.latitude) || !Number.isFinite(metadata.longitude)) {
+      return null;
+    }
+
+    const precision = options?.precision;
+    const clampPrecision = (value: number) => Math.min(10, Math.max(0, value));
+    const format = (value: number) => {
+      if (typeof precision !== "number" || Number.isNaN(precision)) {
+        return String(value);
+      }
+      return value.toFixed(clampPrecision(precision));
+    };
+
+    return `${format(metadata.latitude)},${format(metadata.longitude)}`;
+  }
+
   async getDatasetSummaryText(
     id: DatasetId,
     options?: {
