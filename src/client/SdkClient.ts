@@ -454,6 +454,42 @@ export class SdkClient {
     return toIpfsUri(metadata.ipfsHash ?? "");
   }
 
+  async getDatasetLinks(
+    id: DatasetId,
+    options?: {
+      stacksExplorer?: StacksExplorerOptions;
+      ipfsGatewayBase?: string;
+      openStreetMap?: OpenStreetMapOptions;
+      googleMaps?: GoogleMapsOptions;
+    },
+  ): Promise<{
+    ownerExplorerUrl: string | null;
+    ipfsUri: string | null;
+    ipfsGatewayUrl: string | null;
+    openStreetMapUrl: string | null;
+    googleMapsUrl: string | null;
+  }> {
+    const metadata = await this.getMetadata(id);
+    const coordsOk =
+      Number.isFinite(metadata.latitude) && Number.isFinite(metadata.longitude);
+
+    return {
+      ownerExplorerUrl: metadata.owner
+        ? toStacksExplorerAddressUrl(metadata.owner, options?.stacksExplorer)
+        : null,
+      ipfsUri: metadata.ipfsHash ? toIpfsUri(metadata.ipfsHash) : null,
+      ipfsGatewayUrl: metadata.ipfsHash
+        ? toIpfsGatewayUrl(metadata.ipfsHash, options?.ipfsGatewayBase)
+        : null,
+      openStreetMapUrl: coordsOk
+        ? toOpenStreetMapUrl(metadata.latitude, metadata.longitude, options?.openStreetMap)
+        : null,
+      googleMapsUrl: coordsOk
+        ? toGoogleMapsUrl(metadata.latitude, metadata.longitude, options?.googleMaps)
+        : null,
+    };
+  }
+
   async getDatasetOwnerExplorerUrl(
     id: DatasetId,
     options?: { chain?: "mainnet" | "testnet"; baseUrl?: string },
