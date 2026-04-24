@@ -674,6 +674,18 @@ export class SdkClient {
     return this.buildAbsoluteUrl(`/datasets.geojson${qs}`);
   }
 
+  getDatasetsExportUrls(options?: ListDatasetsOptions): {
+    jsonUrl: string;
+    csvUrl: string;
+    geoJsonUrl: string;
+  } {
+    return {
+      jsonUrl: this.getDatasetsUrl(options),
+      csvUrl: this.getDatasetsCsvUrl(options),
+      geoJsonUrl: this.getDatasetsGeoJsonUrl(options),
+    };
+  }
+
   getHealthUrl(): string {
     return this.buildAbsoluteUrl("/health");
   }

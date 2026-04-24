@@ -17,6 +17,12 @@ describe("URL helpers", () => {
     expect(client.getDatasetsGeoJsonUrl({ bbox: [90, 23, 91, 24] })).toBe(
       "https://api.atmos.example/datasets.geojson?bbox=90%2C23%2C91%2C24",
     );
+
+    expect(client.getDatasetsExportUrls({ search: "wind" })).toEqual({
+      jsonUrl: "https://api.atmos.example/datasets?search=wind",
+      csvUrl: "https://api.atmos.example/datasets.csv?search=wind",
+      geoJsonUrl: "https://api.atmos.example/datasets.geojson?search=wind",
+    });
   });
 
   test("builds health/tags/summary URLs", () => {
