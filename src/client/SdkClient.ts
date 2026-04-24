@@ -610,6 +610,69 @@ export class SdkClient {
     return [...lines, "", ...linkLines].join("\n");
   }
 
+  async getDatasetSummaryMarkdown(
+    id: DatasetId,
+    options?: {
+      includeLinks?: boolean;
+      stacksExplorer?: StacksExplorerOptions;
+      ipfsGatewayBase?: string;
+      openStreetMap?: OpenStreetMapOptions;
+      googleMaps?: GoogleMapsOptions;
+    },
+  ): Promise<string> {
+    const metadata = await this.getMetadata(id);
+    const datasetId = metadata.id ?? id;
+    const includeLinks = options?.includeLinks ?? true;
+
+    const safe = (value: unknown) => String(value ?? "").trim();
+    const coordsOk =
+      Number.isFinite(metadata.latitude) && Number.isFinite(metadata.longitude);
+
+    const lines = [
+      `## Dataset #${datasetId}: ${safe(metadata.name)}`,
+      ``,
+      `- Type: ${safe(metadata.dataType)}`,
+      metadata.status ? `- Status: ${safe(metadata.status)}` : "",
+      `- Visibility: ${metadata.isPublic ? "Public" : "Private"}`,
+      metadata.owner ? `- Owner: ${safe(metadata.owner)}` : "",
+      `- Collection date: ${safe(metadata.collectionDate)}`,
+      typeof metadata.createdAt === "number" ? `- Created at: ${safe(metadata.createdAt)}` : "",
+      `- Altitude: ${safe(metadata.altitudeMin)}-${safe(metadata.altitudeMax)} m`,
+      coordsOk ? `- Coordinates: ${safe(metadata.latitude)}, ${safe(metadata.longitude)} (deg)` : "",
+      metadata.ipfsHash ? `- IPFS: ${safe(metadata.ipfsHash)}` : "",
+    ].filter(Boolean);
+
+    const description = safe(metadata.description);
+    if (description) {
+      lines.push("", description);
+    }
+
+    if (!includeLinks) {
+      return lines.join("\n");
+    }
+
+    const links = await this.getDatasetLinks(id, {
+      stacksExplorer: options?.stacksExplorer,
+      ipfsGatewayBase: options?.ipfsGatewayBase,
+      openStreetMap: options?.openStreetMap,
+      googleMaps: options?.googleMaps,
+    });
+
+    const linkLines = [
+      links.ownerExplorerUrl ? `- Owner explorer: ${links.ownerExplorerUrl}` : "",
+      links.ipfsUri ? `- IPFS uri: ${links.ipfsUri}` : "",
+      links.ipfsGatewayUrl ? `- IPFS gateway: ${links.ipfsGatewayUrl}` : "",
+      links.openStreetMapUrl ? `- OpenStreetMap: ${links.openStreetMapUrl}` : "",
+      links.googleMapsUrl ? `- Google Maps: ${links.googleMapsUrl}` : "",
+    ].filter(Boolean);
+
+    if (linkLines.length === 0) {
+      return lines.join("\n");
+    }
+
+    return [...lines, "", "### Links", ...linkLines].join("\n");
+  }
+
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
     const metadata = await this.getMetadata(id);
     if (!Number.isFinite(metadata.latitude) || !Number.isFinite(metadata.longitude)) {
