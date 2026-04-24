@@ -34,11 +34,10 @@ describe("SdkClient.getDatasetCoordinatesMicroDegrees", () => {
 
   test("returns null when metadata coordinates are invalid", async () => {
     const transport: Transport = {
-      request: async () => ({ ...baseMetadata(), latitude: Number.NaN }),
+      request: async () => ({ ...baseMetadata(), latitude: 91 }),
     };
     const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
 
     await expect(client.getDatasetCoordinatesMicroDegrees(1)).resolves.toBeNull();
   });
 });
-

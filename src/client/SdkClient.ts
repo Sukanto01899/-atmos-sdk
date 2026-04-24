@@ -45,7 +45,7 @@ import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
 import { toIpfsGatewayUrl, toIpfsUri } from "../utils/ipfs";
-import { toMicroDegrees } from "../utils/coords";
+import { isValidLatLonDegrees, toMicroDegrees } from "../utils/coords";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
 import {
@@ -470,8 +470,7 @@ export class SdkClient {
     googleMapsUrl: string | null;
   }> {
     const metadata = await this.getMetadata(id);
-    const coordsOk =
-      Number.isFinite(metadata.latitude) && Number.isFinite(metadata.longitude);
+    const coordsOk = isValidLatLonDegrees(metadata.latitude, metadata.longitude);
 
     return {
       ownerExplorerUrl: metadata.owner
@@ -518,6 +517,9 @@ export class SdkClient {
     id: DatasetId,
   ): Promise<{ latitude: number; longitude: number } | null> {
     const metadata = await this.getMetadata(id);
+    if (!isValidLatLonDegrees(metadata.latitude, metadata.longitude)) {
+      return null;
+    }
     const latitude = toMicroDegrees(metadata.latitude);
     const longitude = toMicroDegrees(metadata.longitude);
     if (latitude === null || longitude === null) {
@@ -531,7 +533,7 @@ export class SdkClient {
     options?: { precision?: number },
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
-    if (!Number.isFinite(metadata.latitude) || !Number.isFinite(metadata.longitude)) {
+    if (!isValidLatLonDegrees(metadata.latitude, metadata.longitude)) {
       return null;
     }
 
@@ -562,8 +564,7 @@ export class SdkClient {
     const includeLinks = options?.includeLinks ?? true;
 
     const safe = (value: unknown) => String(value ?? "").trim();
-    const coordsOk =
-      Number.isFinite(metadata.latitude) && Number.isFinite(metadata.longitude);
+    const coordsOk = isValidLatLonDegrees(metadata.latitude, metadata.longitude);
 
     const lines = [
       `Dataset #${datasetId}: ${safe(metadata.name)}`,
@@ -625,8 +626,7 @@ export class SdkClient {
     const includeLinks = options?.includeLinks ?? true;
 
     const safe = (value: unknown) => String(value ?? "").trim();
-    const coordsOk =
-      Number.isFinite(metadata.latitude) && Number.isFinite(metadata.longitude);
+    const coordsOk = isValidLatLonDegrees(metadata.latitude, metadata.longitude);
 
     const lines = [
       `## Dataset #${datasetId}: ${safe(metadata.name)}`,
@@ -675,7 +675,7 @@ export class SdkClient {
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
     const metadata = await this.getMetadata(id);
-    if (!Number.isFinite(metadata.latitude) || !Number.isFinite(metadata.longitude)) {
+    if (!isValidLatLonDegrees(metadata.latitude, metadata.longitude)) {
       return null;
     }
 

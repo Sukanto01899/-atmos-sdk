@@ -1,3 +1,5 @@
+import { isValidLatLonDegrees } from "./coords";
+
 export type GoogleMapsOptions = { zoom?: number; baseUrl?: string };
 
 const normalizeBase = (base: string) => {
@@ -19,7 +21,7 @@ export const toGoogleMapsUrl = (
   longitudeDegrees: number,
   options?: GoogleMapsOptions,
 ): string | null => {
-  if (!Number.isFinite(latitudeDegrees) || !Number.isFinite(longitudeDegrees)) {
+  if (!isValidLatLonDegrees(latitudeDegrees, longitudeDegrees)) {
     return null;
   }
 
@@ -49,4 +51,3 @@ export const toGoogleMapsUrlFromMicroDegrees = (
     options,
   );
 };
-

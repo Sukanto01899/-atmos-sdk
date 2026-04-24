@@ -1,7 +1,7 @@
 import type { DatasetMetadata, OnChainPublisher } from "../types";
 import { SdkError } from "../types";
 import { boolCV, intCV, stringAsciiCV, stringUtf8CV, uintCV } from "@stacks/transactions";
-import { toMicroDegrees } from "../utils/coords";
+import { isValidLatLonDegrees, toMicroDegrees } from "../utils/coords";
 
 export interface StacksRegisterDatasetTx {
   contractAddress: string;
@@ -22,6 +22,13 @@ export const createStacksOnChainPublisher = (
     buildRegisterDatasetTx(metadata: DatasetMetadata): StacksRegisterDatasetTx {
       if (!metadata.ipfsHash) {
         throw new SdkError("E_ONCHAIN", "metadata.ipfsHash is required for on-chain registration.");
+      }
+
+      if (!isValidLatLonDegrees(metadata.latitude, metadata.longitude)) {
+        throw new SdkError(
+          "E_ONCHAIN",
+          "metadata.latitude/metadata.longitude must be valid degrees (lat [-90,90], lon [-180,180]).",
+        );
       }
 
       const latitude = toMicroDegrees(metadata.latitude);

@@ -40,7 +40,7 @@ describe("SdkClient.getDatasetLinks", () => {
 
   test("nulls out map urls when coordinates are invalid", async () => {
     const transport: Transport = {
-      request: async () => ({ ...baseMetadata(), longitude: Number.NaN }),
+      request: async () => ({ ...baseMetadata(), longitude: 181 }),
     };
     const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
 
@@ -49,4 +49,3 @@ describe("SdkClient.getDatasetLinks", () => {
     expect(links.googleMapsUrl).toBeNull();
   });
 });
-

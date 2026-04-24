@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { fromMicroDegrees, toMicroDegrees } from "../src/utils/coords";
+import {
+  fromMicroDegrees,
+  isValidLatLonDegrees,
+  isValidLatitudeDegrees,
+  isValidLongitudeDegrees,
+  toMicroDegrees,
+} from "../src/utils/coords";
 
 describe("coords utils", () => {
   test("converts degrees to rounded micro-degrees", () => {
@@ -21,5 +27,19 @@ describe("coords utils", () => {
     expect(fromMicroDegrees(Number.NaN)).toBeNull();
     expect(fromMicroDegrees(Number.NEGATIVE_INFINITY)).toBeNull();
   });
-});
 
+  test("validates lat/lon degree ranges", () => {
+    expect(isValidLatitudeDegrees(90)).toBe(true);
+    expect(isValidLatitudeDegrees(-90)).toBe(true);
+    expect(isValidLatitudeDegrees(90.0001)).toBe(false);
+    expect(isValidLatitudeDegrees(Number.NaN)).toBe(false);
+
+    expect(isValidLongitudeDegrees(180)).toBe(true);
+    expect(isValidLongitudeDegrees(-180)).toBe(true);
+    expect(isValidLongitudeDegrees(180.5)).toBe(false);
+
+    expect(isValidLatLonDegrees(23.65, 90.55)).toBe(true);
+    expect(isValidLatLonDegrees(91, 0)).toBe(false);
+    expect(isValidLatLonDegrees(0, 181)).toBe(false);
+  });
+});

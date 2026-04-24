@@ -57,7 +57,7 @@ describe("SdkClient.getDatasetSummaryText", () => {
 
   test("omits map links when coordinates are invalid", async () => {
     const transport: Transport = {
-      request: async () => ({ ...baseMetadata(), latitude: Number.NaN }),
+      request: async () => ({ ...baseMetadata(), latitude: 91 }),
     };
     const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
 
@@ -66,4 +66,3 @@ describe("SdkClient.getDatasetSummaryText", () => {
     expect(text).not.toContain("Google Maps:");
   });
 });
-

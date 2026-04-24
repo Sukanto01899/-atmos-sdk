@@ -81,7 +81,13 @@ export {
   toGoogleMapsUrlFromMicroDegrees,
 } from "./utils/googleMaps";
 export type { GoogleMapsOptions } from "./utils/googleMaps";
-export { toMicroDegrees, fromMicroDegrees } from "./utils/coords";
+export {
+  toMicroDegrees,
+  fromMicroDegrees,
+  isValidLatitudeDegrees,
+  isValidLongitudeDegrees,
+  isValidLatLonDegrees,
+} from "./utils/coords";
 export {
   computeSha256AndSize,
   readToArrayBuffer,

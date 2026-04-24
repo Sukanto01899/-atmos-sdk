@@ -11,6 +11,11 @@ describe("open street map utils", () => {
     expect(toOpenStreetMapUrlFromMicroDegrees(Number.NaN, 0)).toBeNull();
   });
 
+  test("returns null for out-of-range degrees", () => {
+    expect(toOpenStreetMapUrl(91, 0)).toBeNull();
+    expect(toOpenStreetMapUrl(0, 181)).toBeNull();
+  });
+
   test("builds a default url (zoom 11) for degrees", () => {
     expect(toOpenStreetMapUrl(23.65, 90.55)).toBe(
       "https://www.openstreetmap.org/?mlat=23.65&mlon=90.55#map=11/23.65/90.55",
@@ -32,4 +37,3 @@ describe("open street map utils", () => {
     );
   });
 });
-

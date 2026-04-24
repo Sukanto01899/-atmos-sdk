@@ -1,5 +1,7 @@
 export type OpenStreetMapOptions = { zoom?: number; baseUrl?: string };
 
+import { isValidLatLonDegrees } from "./coords";
+
 const normalizeBase = (base: string) => {
   const trimmed = (base ?? "").trim();
   if (!trimmed) {
@@ -19,7 +21,7 @@ export const toOpenStreetMapUrl = (
   longitudeDegrees: number,
   options?: OpenStreetMapOptions,
 ): string | null => {
-  if (!Number.isFinite(latitudeDegrees) || !Number.isFinite(longitudeDegrees)) {
+  if (!isValidLatLonDegrees(latitudeDegrees, longitudeDegrees)) {
     return null;
   }
 
@@ -53,4 +55,3 @@ export const toOpenStreetMapUrlFromMicroDegrees = (
     options,
   );
 };
-

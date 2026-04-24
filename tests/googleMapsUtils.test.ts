@@ -11,6 +11,11 @@ describe("google maps utils", () => {
     expect(toGoogleMapsUrlFromMicroDegrees(Number.NaN, 0)).toBeNull();
   });
 
+  test("returns null for out-of-range degrees", () => {
+    expect(toGoogleMapsUrl(91, 0)).toBeNull();
+    expect(toGoogleMapsUrl(0, 181)).toBeNull();
+  });
+
   test("builds a default url (zoom 11) for degrees", () => {
     expect(toGoogleMapsUrl(23.65, 90.55)).toBe(
       "https://www.google.com/maps?q=23.65%2C90.55&z=11",
@@ -32,4 +37,3 @@ describe("google maps utils", () => {
     );
   });
 });
-

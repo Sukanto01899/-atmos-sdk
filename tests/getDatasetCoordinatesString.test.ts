@@ -38,11 +38,10 @@ describe("SdkClient.getDatasetCoordinatesString", () => {
 
   test("returns null for invalid coords", async () => {
     const transport: Transport = {
-      request: async () => ({ ...baseMetadata(), latitude: Number.NaN }),
+      request: async () => ({ ...baseMetadata(), longitude: 181 }),
     };
     const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
 
     await expect(client.getDatasetCoordinatesString(1)).resolves.toBeNull();
   });
 });
-
