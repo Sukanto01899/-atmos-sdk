@@ -4,6 +4,7 @@ import {
   isValidLatLonDegrees,
   isValidLatitudeDegrees,
   isValidLongitudeDegrees,
+  parseLatLonDegrees,
   toMicroDegrees,
 } from "../src/utils/coords";
 
@@ -41,5 +42,23 @@ describe("coords utils", () => {
     expect(isValidLatLonDegrees(23.65, 90.55)).toBe(true);
     expect(isValidLatLonDegrees(91, 0)).toBe(false);
     expect(isValidLatLonDegrees(0, 181)).toBe(false);
+  });
+
+  test("parses lat/lon degree strings", () => {
+    expect(parseLatLonDegrees("23.65,90.55")).toEqual({
+      latitudeDegrees: 23.65,
+      longitudeDegrees: 90.55,
+    });
+    expect(parseLatLonDegrees(" ( 23.65  90.55 ) ")).toEqual({
+      latitudeDegrees: 23.65,
+      longitudeDegrees: 90.55,
+    });
+    expect(parseLatLonDegrees("")).toBeNull();
+    expect(parseLatLonDegrees("23.65")).toBeNull();
+    expect(parseLatLonDegrees("91,0")).toBeNull();
+    expect(parseLatLonDegrees("0,181")).toBeNull();
+    expect(parseLatLonDegrees("NaN,0")).toBeNull();
+    expect(parseLatLonDegrees("23.65,90.55,0")).toBeNull();
+    expect(parseLatLonDegrees("23.65 abc")).toBeNull();
   });
 });

@@ -87,6 +87,7 @@ export {
   isValidLatitudeDegrees,
   isValidLongitudeDegrees,
   isValidLatLonDegrees,
+  parseLatLonDegrees,
 } from "./utils/coords";
 export {
   computeSha256AndSize,

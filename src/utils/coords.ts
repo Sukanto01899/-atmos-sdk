@@ -16,3 +16,24 @@ export const isValidLongitudeDegrees = (longitudeDegrees: number): boolean =>
 
 export const isValidLatLonDegrees = (latitudeDegrees: number, longitudeDegrees: number): boolean =>
   isValidLatitudeDegrees(latitudeDegrees) && isValidLongitudeDegrees(longitudeDegrees);
+
+export const parseLatLonDegrees = (
+  input: string,
+): { latitudeDegrees: number; longitudeDegrees: number } | null => {
+  const trimmed = String(input ?? "").trim();
+  if (!trimmed) return null;
+
+  const normalized = trimmed.replace(/[()]/g, "");
+  const parts = normalized
+    .split(/[,\s]+/g)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (parts.length !== 2) return null;
+
+  const latitudeDegrees = Number(parts[0]);
+  const longitudeDegrees = Number(parts[1]);
+
+  if (!isValidLatLonDegrees(latitudeDegrees, longitudeDegrees)) return null;
+  return { latitudeDegrees, longitudeDegrees };
+};
