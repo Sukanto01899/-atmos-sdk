@@ -17,6 +17,28 @@ export const isValidLongitudeDegrees = (longitudeDegrees: number): boolean =>
 export const isValidLatLonDegrees = (latitudeDegrees: number, longitudeDegrees: number): boolean =>
   isValidLatitudeDegrees(latitudeDegrees) && isValidLongitudeDegrees(longitudeDegrees);
 
+export type LatLonDegreesStringOptions = { precision?: number; separator?: string };
+
+export const toLatLonDegreesString = (
+  latitudeDegrees: number,
+  longitudeDegrees: number,
+  options?: LatLonDegreesStringOptions,
+): string | null => {
+  if (!isValidLatLonDegrees(latitudeDegrees, longitudeDegrees)) return null;
+
+  const precision = options?.precision;
+  const separator = options?.separator ?? ",";
+  const clampPrecision = (value: number) => Math.min(10, Math.max(0, value));
+  const format = (value: number) => {
+    if (typeof precision !== "number" || Number.isNaN(precision)) {
+      return String(value);
+    }
+    return value.toFixed(clampPrecision(precision));
+  };
+
+  return `${format(latitudeDegrees)}${separator}${format(longitudeDegrees)}`;
+};
+
 export const parseLatLonDegrees = (
   input: string,
 ): { latitudeDegrees: number; longitudeDegrees: number } | null => {

@@ -45,7 +45,7 @@ import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
 import { toIpfsGatewayUrl, toIpfsUri } from "../utils/ipfs";
-import { isValidLatLonDegrees, toMicroDegrees } from "../utils/coords";
+import { isValidLatLonDegrees, toLatLonDegreesString, toMicroDegrees } from "../utils/coords";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
 import {
@@ -533,20 +533,9 @@ export class SdkClient {
     options?: { precision?: number },
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
-    if (!isValidLatLonDegrees(metadata.latitude, metadata.longitude)) {
-      return null;
-    }
-
-    const precision = options?.precision;
-    const clampPrecision = (value: number) => Math.min(10, Math.max(0, value));
-    const format = (value: number) => {
-      if (typeof precision !== "number" || Number.isNaN(precision)) {
-        return String(value);
-      }
-      return value.toFixed(clampPrecision(precision));
-    };
-
-    return `${format(metadata.latitude)},${format(metadata.longitude)}`;
+    return toLatLonDegreesString(metadata.latitude, metadata.longitude, {
+      precision: options?.precision,
+    });
   }
 
   async getDatasetSummaryText(

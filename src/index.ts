@@ -87,8 +87,10 @@ export {
   isValidLatitudeDegrees,
   isValidLongitudeDegrees,
   isValidLatLonDegrees,
+  toLatLonDegreesString,
   parseLatLonDegrees,
 } from "./utils/coords";
+export type { LatLonDegreesStringOptions } from "./utils/coords";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
