@@ -94,6 +94,7 @@ export type { LatLonDegreesStringOptions } from "./utils/coords";
 export { toGeoUri, toGeoUriFromMicroDegrees } from "./utils/geoUri";
 export type { GeoUriOptions } from "./utils/geoUri";
 export { haversineDistanceMeters } from "./utils/distance";
+export { isValidBboxDegrees, parseBboxDegrees, toBboxQueryParam } from "./utils/bbox";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
