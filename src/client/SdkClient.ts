@@ -46,6 +46,7 @@ import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
 import { toIpfsGatewayUrl, toIpfsUri } from "../utils/ipfs";
 import { isValidLatLonDegrees, toLatLonDegreesString, toMicroDegrees } from "../utils/coords";
+import { toGeoUri, type GeoUriOptions } from "../utils/geoUri";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
 import {
@@ -489,6 +490,18 @@ export class SdkClient {
   ): Promise<string | null> {
     const metadata = await this.getMetadata(id);
     return toGoogleMapsUrl(metadata.latitude, metadata.longitude, options);
+  }
+
+  async getDatasetGeoUri(
+    id: DatasetId,
+    options?: GeoUriOptions,
+  ): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    const label = String(options?.label ?? metadata.name ?? "").trim();
+    return toGeoUri(metadata.latitude, metadata.longitude, {
+      ...options,
+      label: label || undefined,
+    });
   }
 
   async getDatasetCoordinatesMicroDegrees(
