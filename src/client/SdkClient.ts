@@ -49,6 +49,11 @@ import { isValidLatLonDegrees, toLatLonDegreesString, toMicroDegrees } from "../
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
 import { toOpenStreetMapUrl, type OpenStreetMapOptions } from "../utils/openStreetMap";
 import {
+  getDatasetLinksFromMetadata,
+  type DatasetLinks,
+  type DatasetLinksOptions,
+} from "../utils/datasetLinks";
+import {
   toStacksExplorerAddressUrl,
   type StacksExplorerOptions,
 } from "../utils/stacksExplorer";
@@ -456,37 +461,10 @@ export class SdkClient {
 
   async getDatasetLinks(
     id: DatasetId,
-    options?: {
-      stacksExplorer?: StacksExplorerOptions;
-      ipfsGatewayBase?: string;
-      openStreetMap?: OpenStreetMapOptions;
-      googleMaps?: GoogleMapsOptions;
-    },
-  ): Promise<{
-    ownerExplorerUrl: string | null;
-    ipfsUri: string | null;
-    ipfsGatewayUrl: string | null;
-    openStreetMapUrl: string | null;
-    googleMapsUrl: string | null;
-  }> {
+    options?: DatasetLinksOptions,
+  ): Promise<DatasetLinks> {
     const metadata = await this.getMetadata(id);
-    const coordsOk = isValidLatLonDegrees(metadata.latitude, metadata.longitude);
-
-    return {
-      ownerExplorerUrl: metadata.owner
-        ? toStacksExplorerAddressUrl(metadata.owner, options?.stacksExplorer)
-        : null,
-      ipfsUri: metadata.ipfsHash ? toIpfsUri(metadata.ipfsHash) : null,
-      ipfsGatewayUrl: metadata.ipfsHash
-        ? toIpfsGatewayUrl(metadata.ipfsHash, options?.ipfsGatewayBase)
-        : null,
-      openStreetMapUrl: coordsOk
-        ? toOpenStreetMapUrl(metadata.latitude, metadata.longitude, options?.openStreetMap)
-        : null,
-      googleMapsUrl: coordsOk
-        ? toGoogleMapsUrl(metadata.latitude, metadata.longitude, options?.googleMaps)
-        : null,
-    };
+    return getDatasetLinksFromMetadata(metadata, options);
   }
 
   async getDatasetOwnerExplorerUrl(

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { SdkClient } from "../src/client/SdkClient";
-import type { DatasetMetadata, Transport } from "../src/types";
+import { getDatasetLinksFromMetadata } from "../src/utils/datasetLinks";
+import type { DatasetMetadata } from "../src/types";
 
 const baseMetadata = (): DatasetMetadata => ({
   id: 123,
@@ -19,35 +19,30 @@ const baseMetadata = (): DatasetMetadata => ({
   ipfsHash: "QmWindProfileExampleHash",
 });
 
-describe("SdkClient.getDatasetLinks", () => {
-  test("returns a bundle of useful urls", async () => {
-    const transport: Transport = {
-      request: async (method, path) => {
-        expect(method).toBe("GET");
-        expect(path).toBe("/datasets/123");
-        return baseMetadata();
-      },
-    };
-    const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
+describe("dataset links utils", () => {
+  test("builds useful links from metadata", () => {
+    const links = getDatasetLinksFromMetadata(baseMetadata(), {
+      ipfsGatewayBase: "https://cloudflare-ipfs.com",
+    });
 
-    const links = await client.getDatasetLinks(123, { ipfsGatewayBase: "https://cloudflare-ipfs.com" });
     expect(links.ownerExplorerUrl).toContain("https://explorer.hiro.so/address/");
     expect(links.ipfsUri).toBe("ipfs://QmWindProfileExampleHash");
     expect(links.ipfsGatewayUrl).toBe("https://cloudflare-ipfs.com/ipfs/QmWindProfileExampleHash");
     expect(links.openStreetMapUrl).toContain("https://www.openstreetmap.org/");
     expect(links.googleMapsUrl).toContain("https://www.google.com/maps");
-    expect(links.geoUri).toContain("geo:");
+    expect(links.geoUri).toBe("geo:23.65,90.55?q=23.65%2C90.55(Delta%20Wind%20Profile)");
   });
 
-  test("nulls out map urls when coordinates are invalid", async () => {
-    const transport: Transport = {
-      request: async () => ({ ...baseMetadata(), longitude: 181 }),
-    };
-    const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
+  test("supports geoUri disabling", () => {
+    const links = getDatasetLinksFromMetadata(baseMetadata(), { geoUri: false });
+    expect(links.geoUri).toBeNull();
+  });
 
-    const links = await client.getDatasetLinks(123);
+  test("nulls map + geo when coords invalid", () => {
+    const links = getDatasetLinksFromMetadata({ ...baseMetadata(), longitude: 181 });
     expect(links.openStreetMapUrl).toBeNull();
     expect(links.googleMapsUrl).toBeNull();
     expect(links.geoUri).toBeNull();
   });
 });
+

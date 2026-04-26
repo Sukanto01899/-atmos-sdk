@@ -96,6 +96,11 @@ export type { GeoUriOptions } from "./utils/geoUri";
 export { haversineDistanceMeters } from "./utils/distance";
 export { isValidBboxDegrees, parseBboxDegrees, toBboxQueryParam } from "./utils/bbox";
 export {
+  getDatasetLinksFromMetadata,
+  type DatasetLinks,
+  type DatasetLinksOptions,
+} from "./utils/datasetLinks";
+export {
   computeSha256AndSize,
   readToArrayBuffer,
   sha256HexFromArrayBuffer,
