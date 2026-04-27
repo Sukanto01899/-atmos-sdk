@@ -88,9 +88,12 @@ export {
   isValidLongitudeDegrees,
   isValidLatLonDegrees,
   toLatLonDegreesString,
+  toLatitudeDmsString,
+  toLongitudeDmsString,
+  toLatLonDmsString,
   parseLatLonDegrees,
 } from "./utils/coords";
-export type { LatLonDegreesStringOptions } from "./utils/coords";
+export type { DmsStringOptions, LatLonDegreesStringOptions } from "./utils/coords";
 export { toGeoUri, toGeoUriFromMicroDegrees } from "./utils/geoUri";
 export type { GeoUriOptions } from "./utils/geoUri";
 export { haversineDistanceMeters } from "./utils/distance";
