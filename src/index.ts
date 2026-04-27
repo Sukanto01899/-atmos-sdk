@@ -103,6 +103,8 @@ export {
   type DatasetLinks,
   type DatasetLinksOptions,
 } from "./utils/datasetLinks";
+export { formatBytes } from "./utils/bytes";
+export type { FormatBytesOptions } from "./utils/bytes";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
