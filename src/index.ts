@@ -107,6 +107,8 @@ export { formatBytes } from "./utils/bytes";
 export type { FormatBytesOptions } from "./utils/bytes";
 export { slugify, toDatasetSlug } from "./utils/slug";
 export type { DatasetSlugOptions, SlugifyOptions } from "./utils/slug";
+export { sanitizeFilename, toDatasetFilename } from "./utils/filename";
+export type { DatasetFilenameOptions, SanitizeFilenameOptions } from "./utils/filename";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
