@@ -110,6 +110,8 @@ export type { DatasetSlugOptions, SlugifyOptions } from "./utils/slug";
 export { sanitizeFilename, toDatasetFilename } from "./utils/filename";
 export type { DatasetFilenameOptions, SanitizeFilenameOptions } from "./utils/filename";
 export { isValidUnixSeconds, parseUnixSecondsFromIsoString, toIsoStringFromUnixSeconds } from "./utils/time";
+export { truncateText } from "./utils/text";
+export type { TruncateTextOptions } from "./utils/text";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
