@@ -112,6 +112,7 @@ export type { DatasetFilenameOptions, SanitizeFilenameOptions } from "./utils/fi
 export { isValidUnixSeconds, parseUnixSecondsFromIsoString, toIsoStringFromUnixSeconds } from "./utils/time";
 export { truncateText } from "./utils/text";
 export type { TruncateTextOptions } from "./utils/text";
+export { isValidDatasetId, toDatasetId } from "./utils/datasetId";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
