@@ -109,6 +109,7 @@ export { slugify, toDatasetSlug } from "./utils/slug";
 export type { DatasetSlugOptions, SlugifyOptions } from "./utils/slug";
 export { sanitizeFilename, toDatasetFilename } from "./utils/filename";
 export type { DatasetFilenameOptions, SanitizeFilenameOptions } from "./utils/filename";
+export { isValidUnixSeconds, parseUnixSecondsFromIsoString, toIsoStringFromUnixSeconds } from "./utils/time";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
