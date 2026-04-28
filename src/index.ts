@@ -113,6 +113,8 @@ export { isValidUnixSeconds, parseUnixSecondsFromIsoString, toIsoStringFromUnixS
 export { truncateText } from "./utils/text";
 export type { TruncateTextOptions } from "./utils/text";
 export { isValidDatasetId, toDatasetId } from "./utils/datasetId";
+export { safeJsonParse, safeJsonStringify } from "./utils/json";
+export type { SafeJsonParseOptions, SafeJsonStringifyOptions } from "./utils/json";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
