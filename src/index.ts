@@ -115,6 +115,8 @@ export type { TruncateTextOptions } from "./utils/text";
 export { isValidDatasetId, toDatasetId } from "./utils/datasetId";
 export { safeJsonParse, safeJsonStringify } from "./utils/json";
 export type { SafeJsonParseOptions, SafeJsonStringifyOptions } from "./utils/json";
+export { formatDatasetCitationText } from "./utils/citation";
+export type { DatasetCitationOptions } from "./utils/citation";
 export {
   computeSha256AndSize,
   readToArrayBuffer,

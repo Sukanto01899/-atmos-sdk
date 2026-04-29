@@ -58,6 +58,7 @@ import {
   toStacksExplorerAddressUrl,
   type StacksExplorerOptions,
 } from "../utils/stacksExplorer";
+import { formatDatasetCitationText } from "../utils/citation";
 
 export class SdkClient {
   private readonly baseUrl;
@@ -651,6 +652,23 @@ export class SdkClient {
     }
 
     return [...lines, "", "### Links", ...linkLines].join("\n");
+  }
+
+  async getDatasetCitationText(
+    id: DatasetId,
+    options?: { detailUrl?: string | null; accessedAt?: string | Date },
+  ): Promise<string> {
+    const metadata = await this.getMetadata(id);
+    return formatDatasetCitationText(
+      {
+        ...metadata,
+        id: metadata.id ?? id,
+      },
+      {
+        detailUrl: options?.detailUrl,
+        accessedAt: options?.accessedAt,
+      },
+    );
   }
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
