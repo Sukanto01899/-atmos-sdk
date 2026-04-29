@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { SdkClient } from "../src/client/SdkClient";
 import type { DatasetMetadata, Transport } from "../src/types";
-import { formatDatasetCitationText } from "../src/utils/citation";
+import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../src/utils/citation";
 
 const baseMetadata = (): DatasetMetadata => ({
   id: 123,
@@ -48,6 +48,34 @@ describe("formatDatasetCitationText", () => {
   });
 });
 
+describe("formatDatasetCitationMarkdown", () => {
+  test("formats a small multi-line markdown block", () => {
+    const md = formatDatasetCitationMarkdown(baseMetadata(), {
+      detailUrl: "https://app.atmos.example/datasets/123",
+      accessedAt: "2026-04-30",
+    });
+
+    expect(md).toContain("**Atmos Registry dataset #123**");
+    expect(md).toContain("- Name: Delta Wind Profile");
+    expect(md).toContain("- Type: wind");
+    expect(md).toContain("- Link: https://app.atmos.example/datasets/123");
+    expect(md).toContain("- Accessed: 2026-04-30");
+  });
+
+  test("can return a single-line sentence when multiline is false", () => {
+    const md = formatDatasetCitationMarkdown(baseMetadata(), {
+      detailUrl: "https://app.atmos.example/datasets/123",
+      accessedAt: "2026-04-30",
+      multiline: false,
+    });
+
+    expect(md).toContain("Atmos Registry dataset #123.");
+    expect(md).toContain("Available at: https://app.atmos.example/datasets/123.");
+    expect(md).toContain("Accessed: 2026-04-30.");
+    expect(md).not.toContain("\n");
+  });
+});
+
 describe("SdkClient.getDatasetCitationText", () => {
   test("fetches metadata and formats a citation", async () => {
     const transport: Transport = {
@@ -70,3 +98,20 @@ describe("SdkClient.getDatasetCitationText", () => {
   });
 });
 
+describe("SdkClient.getDatasetCitationMarkdown", () => {
+  test("fetches metadata and formats markdown", async () => {
+    const transport: Transport = {
+      request: async () => baseMetadata(),
+    };
+
+    const client = new SdkClient({ baseUrl: "https://api.atmos.example/", transport });
+    const md = await client.getDatasetCitationMarkdown(123, {
+      detailUrl: "https://app.atmos.example/datasets/123",
+      accessedAt: "2026-04-30",
+    });
+
+    expect(md).toContain("**Atmos Registry dataset #123**");
+    expect(md).toContain("- Link: https://app.atmos.example/datasets/123");
+    expect(md).toContain("- Accessed: 2026-04-30");
+  });
+});

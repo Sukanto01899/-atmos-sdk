@@ -13,6 +13,14 @@ export type DatasetCitationOptions = {
   accessedAt?: string | Date;
 };
 
+export type DatasetCitationMarkdownOptions = DatasetCitationOptions & {
+  /**
+   * When true, returns a small multi-line markdown block instead of a single sentence.
+   * Default: true.
+   */
+  multiline?: boolean;
+};
+
 const toAccessDate = (value?: string | Date): string => {
   if (!value) {
     return new Date().toISOString().slice(0, 10);
@@ -51,3 +59,30 @@ export const formatDatasetCitationText = (
   return parts.join(" ");
 };
 
+export const formatDatasetCitationMarkdown = (
+  metadata: DatasetMetadata,
+  options?: DatasetCitationMarkdownOptions,
+): string => {
+  const safe = (value: unknown) => String(value ?? "").trim();
+  const datasetId = safe(metadata.id);
+  const accessedAt = toAccessDate(options?.accessedAt);
+  const detailUrl = options?.detailUrl ? safe(options.detailUrl) : "";
+  const multiline = options?.multiline ?? true;
+
+  if (!multiline) {
+    return formatDatasetCitationText(metadata, { detailUrl, accessedAt });
+  }
+
+  const lines = [
+    datasetId ? `**Atmos Registry dataset #${datasetId}**` : "**Atmos Registry dataset**",
+    safe(metadata.name) ? `- Name: ${safe(metadata.name)}` : "",
+    safe(metadata.dataType) ? `- Type: ${safe(metadata.dataType)}` : "",
+    metadata.owner ? `- Owner: ${safe(metadata.owner)}` : "",
+    Number.isFinite(metadata.collectionDate) ? `- Collection date: ${safe(metadata.collectionDate)}` : "",
+    typeof metadata.createdAt === "number" ? `- Recorded: ${safe(metadata.createdAt)}` : "",
+    detailUrl ? `- Link: ${detailUrl}` : "",
+    `- Accessed: ${accessedAt}`,
+  ].filter(Boolean);
+
+  return lines.join("\n");
+};

@@ -58,7 +58,7 @@ import {
   toStacksExplorerAddressUrl,
   type StacksExplorerOptions,
 } from "../utils/stacksExplorer";
-import { formatDatasetCitationText } from "../utils/citation";
+import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../utils/citation";
 
 export class SdkClient {
   private readonly baseUrl;
@@ -667,6 +667,28 @@ export class SdkClient {
       {
         detailUrl: options?.detailUrl,
         accessedAt: options?.accessedAt,
+      },
+    );
+  }
+
+  async getDatasetCitationMarkdown(
+    id: DatasetId,
+    options?: {
+      detailUrl?: string | null;
+      accessedAt?: string | Date;
+      multiline?: boolean;
+    },
+  ): Promise<string> {
+    const metadata = await this.getMetadata(id);
+    return formatDatasetCitationMarkdown(
+      {
+        ...metadata,
+        id: metadata.id ?? id,
+      },
+      {
+        detailUrl: options?.detailUrl,
+        accessedAt: options?.accessedAt,
+        multiline: options?.multiline,
       },
     );
   }
