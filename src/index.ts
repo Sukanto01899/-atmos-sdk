@@ -120,6 +120,7 @@ export type {
   DatasetCitationMarkdownOptions,
   DatasetCitationOptions,
 } from "./utils/citation";
+export { getDatasetQualityScore } from "./utils/quality";
 export {
   computeSha256AndSize,
   readToArrayBuffer,

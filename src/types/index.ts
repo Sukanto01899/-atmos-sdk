@@ -15,6 +15,8 @@ export interface DatasetMetadata {
   dataType: string;
   owner?: string;
   status?: DatasetStatus;
+  verified?: boolean;
+  metadataFrozen?: boolean;
   isPublic: boolean;
   collectionDate: number;
   createdAt?: number;

@@ -59,6 +59,7 @@ import {
   type StacksExplorerOptions,
 } from "../utils/stacksExplorer";
 import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../utils/citation";
+import { getDatasetQualityScore } from "../utils/quality";
 
 export class SdkClient {
   private readonly baseUrl;
@@ -691,6 +692,11 @@ export class SdkClient {
         multiline: options?.multiline,
       },
     );
+  }
+
+  async getDatasetQualityScore(id: DatasetId): Promise<number> {
+    const metadata = await this.getMetadata(id);
+    return getDatasetQualityScore(metadata);
   }
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
