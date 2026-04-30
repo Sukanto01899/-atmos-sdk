@@ -122,6 +122,8 @@ export type {
 } from "./utils/citation";
 export { getDatasetQualityScore } from "./utils/quality";
 export { compareDatasetStatusPriority, getDatasetStatusPriority } from "./utils/status";
+export { datasetsToCsv } from "./utils/datasetsCsv";
+export type { CsvCell, DatasetsCsvOptions } from "./utils/datasetsCsv";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
