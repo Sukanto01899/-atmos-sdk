@@ -54,6 +54,8 @@ export type {
   DatasetDiffResult,
 } from "./types";
 export { diffDatasetMetadata } from "./utils/diff";
+export { fromGeoJsonFeature, fromGeoJsonFeatureCollection } from "./utils/fromGeoJson";
+export type { FromGeoJsonOptions } from "./utils/fromGeoJson";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";
