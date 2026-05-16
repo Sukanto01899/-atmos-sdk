@@ -49,7 +49,11 @@ export type {
   VerifyBundleResult,
   WatchOptions,
   WatchHandle,
+  DatasetDiff,
+  DatasetDiffField,
+  DatasetDiffResult,
 } from "./types";
+export { diffDatasetMetadata } from "./utils/diff";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";

@@ -396,6 +396,29 @@ export interface SdkClientOptions {
   onchain?: OnChainPublisher;
 }
 
+export interface DatasetDiffField {
+  field: string;
+  previous: unknown;
+  current: unknown;
+}
+
+export interface DatasetDiff {
+  /** True when the two snapshots are byte-for-byte identical. */
+  isIdentical: boolean;
+  /** Fields present in both snapshots whose values differ. */
+  changed: DatasetDiffField[];
+  /** Fields present in `current` but absent in `previous`. */
+  added: string[];
+  /** Fields present in `previous` but absent in `current`. */
+  removed: string[];
+}
+
+export interface DatasetDiffResult {
+  diff: DatasetDiff;
+  previous: DatasetMetadata;
+  current: DatasetMetadata;
+}
+
 export interface WatchOptions {
   /** Polling interval in milliseconds. Minimum 1 000. Default: 10 000. */
   intervalMs?: number;

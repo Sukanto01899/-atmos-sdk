@@ -5,6 +5,7 @@ import type {
   DatasetMetadata,
   DatasetsGeoJsonFeature,
   DatasetBundleManifest,
+  DatasetDiffResult,
   DownloadOptions,
   DownloadResult,
   DownloadBatchItem,
@@ -40,6 +41,7 @@ import type {
   WatchOptions,
   WatchHandle,
 } from "../types";
+import { diffDatasetMetadata } from "../utils/diff";
 import { httpTransport } from "../transport/http";
 import { SdkError } from "../types";
 import { runBatch } from "../utils/batch";
@@ -811,6 +813,28 @@ export class SdkClient {
       return [];
     }
     return runBatch(ids, (id) => this.getMetadata(id), options);
+  }
+
+  /**
+   * Fetch two datasets by ID and return a structured diff of their metadata.
+   *
+   * The result contains both raw snapshots plus a `diff` object that lists
+   * which fields changed, were added, or were removed.
+   *
+   * @example
+   * const { diff, previous, current } = await sdk.diff("10", "11");
+   * if (!diff.isIdentical) {
+   *   diff.changed.forEach(({ field, previous, current }) =>
+   *     console.log(`${field}: ${String(previous)} → ${String(current)}`)
+   *   );
+   * }
+   */
+  async diff(previousId: DatasetId, currentId: DatasetId): Promise<DatasetDiffResult> {
+    const [previous, current] = await Promise.all([
+      this.getMetadata(previousId),
+      this.getMetadata(currentId),
+    ]);
+    return { diff: diffDatasetMetadata(previous, current), previous, current };
   }
 
   async listDatasets(options?: ListDatasetsOptions): Promise<ListDatasetsResult> {
