@@ -396,6 +396,26 @@ export interface SdkClientOptions {
   onchain?: OnChainPublisher;
 }
 
+export interface WatchOptions {
+  /** Polling interval in milliseconds. Minimum 1 000. Default: 10 000. */
+  intervalMs?: number;
+  /** Stop polling when this signal is aborted. */
+  signal?: AbortSignal;
+  /** Stop polling after the first error. Default: false. */
+  stopOnError?: boolean;
+  /** Called whenever the dataset metadata has changed since the last poll. */
+  onChange: (current: DatasetMetadata, previous: DatasetMetadata) => void;
+  /** Called when a poll fails. Does not stop polling unless stopOnError is true. */
+  onError?: (error: unknown) => void;
+}
+
+export interface WatchHandle {
+  /** Stop polling and release the internal timer. Idempotent. */
+  stop: () => void;
+  /** True once stop() has been called or the AbortSignal fired. */
+  readonly stopped: boolean;
+}
+
 // Used to detect SdkError instances across duplicated installs / realms where `instanceof` may fail.
 export const SDK_ERROR_BRAND = Symbol.for("@atmosstacks/atmos-sdk/SdkError");
 

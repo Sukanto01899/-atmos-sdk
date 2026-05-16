@@ -47,6 +47,8 @@ export type {
   VerifyOptions,
   VerifyResult,
   VerifyBundleResult,
+  WatchOptions,
+  WatchHandle,
 } from "./types";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";

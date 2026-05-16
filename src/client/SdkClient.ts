@@ -37,6 +37,8 @@ import type {
   VerifyResult,
   VerifyBundleResult,
   Bbox,
+  WatchOptions,
+  WatchHandle,
 } from "../types";
 import { httpTransport } from "../transport/http";
 import { SdkError } from "../types";
@@ -447,6 +449,78 @@ export class SdkClient {
 
     this.metadataInFlight.set(key, promise);
     return promise;
+  }
+
+  /**
+   * Poll a dataset for changes and call `options.onChange` whenever the
+   * metadata differs from the previous snapshot.
+   *
+   * Returns a `WatchHandle` whose `stop()` method cancels the watcher.
+   * An `AbortSignal` passed via `options.signal` will also stop it.
+   *
+   * @example
+   * const handle = sdk.watch("42", {
+   *   intervalMs: 5_000,
+   *   onChange(current, previous) {
+   *     console.log(`Status changed: ${previous.status} → ${current.status}`);
+   *   },
+   *   onError(err) { console.error(err); },
+   * });
+   *
+   * // later…
+   * handle.stop();
+   */
+  watch(id: DatasetId, options: WatchOptions): WatchHandle {
+    const intervalMs = Math.max(1_000, options.intervalMs ?? 10_000);
+    let _stopped = false;
+    let previous: DatasetMetadata | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const handle: WatchHandle = {
+      get stopped() {
+        return _stopped;
+      },
+      stop() {
+        if (_stopped) return;
+        _stopped = true;
+        if (timer !== null) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      },
+    };
+
+    if (options.signal?.aborted) {
+      handle.stop();
+      return handle;
+    }
+
+    options.signal?.addEventListener("abort", () => handle.stop(), { once: true });
+
+    const poll = async () => {
+      if (_stopped) return;
+      try {
+        // Always fetch fresh — bypass the TTL cache so watchers see real changes.
+        this.invalidateMetadataCache(id);
+        const current = await this.getMetadata(id);
+        if (previous !== null && JSON.stringify(current) !== JSON.stringify(previous)) {
+          options.onChange(current, previous);
+        }
+        previous = current;
+      } catch (err) {
+        options.onError?.(err);
+        if (options.stopOnError) {
+          handle.stop();
+          return;
+        }
+      }
+      if (!_stopped) {
+        timer = setTimeout(poll, intervalMs);
+      }
+    };
+
+    poll();
+    return handle;
   }
 
   async getDatasetIpfsGatewayUrl(
