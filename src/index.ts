@@ -63,6 +63,7 @@ export { formatRelativeTime, formatDatasetAge } from "./utils/relativeTime";
 export type { FormatRelativeTimeOptions } from "./utils/relativeTime";
 export { sortDatasets } from "./utils/sort";
 export type { DatasetSortMode } from "./utils/sort";
+export { filterDatasets } from "./utils/filter";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";
