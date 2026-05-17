@@ -58,6 +58,7 @@ export { fromGeoJsonFeature, fromGeoJsonFeatureCollection } from "./utils/fromGe
 export type { FromGeoJsonOptions } from "./utils/fromGeoJson";
 export { clusterDatasets } from "./utils/cluster";
 export type { ClusterDatasetsOptions, DatasetCluster } from "./utils/cluster";
+export { summarizeDatasets, groupDatasetsByField } from "./utils/summarize";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";
