@@ -155,4 +155,6 @@ export { deduplicateDatasets } from "./utils/dedupe";
 export { nearestDatasets } from "./utils/nearest";
 export type { NearestDatasetEntry } from "./utils/nearest";
 export { sampleDatasets } from "./utils/sample";
+export { searchDatasets } from "./utils/search";
+export type { SearchResult } from "./utils/search";
 export type { PaginateOptions, PaginateResult } from "./types";
