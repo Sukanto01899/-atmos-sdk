@@ -79,6 +79,7 @@ export type {
   StacksConnectContractCallBaseOptions,
 } from "./onchain/stacks-connect";
 export { withRetry } from "./utils/retry";
+export type { RetryOptions } from "./utils/retry";
 export { isSdkError } from "./utils/errors";
 export { runBatch } from "./utils/batch";
 export { normalizeIpfsCid, toIpfsGatewayUrl, toIpfsUri } from "./utils/ipfs";
@@ -149,3 +150,6 @@ export {
 export { toQueryString } from "./utils/query";
 export { parseCsvWithHeader } from "./utils/csv";
 export { inferSchema } from "./utils/schema";
+export { paginateDatasets } from "./utils/paginate";
+export { deduplicateDatasets } from "./utils/dedupe";
+export type { PaginateOptions, PaginateResult } from "./types";

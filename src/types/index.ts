@@ -117,6 +117,8 @@ export interface BatchOptions {
   stopOnError?: boolean;
   retries?: number;
   retryDelayMs?: number;
+  /** Called after each item failure. Does not stop the batch unless stopOnError is set. */
+  onError?: (error: unknown, index: number) => void;
   onProgress?: (progress: BatchProgress) => void;
 }
 
@@ -290,6 +292,31 @@ export interface SummaryResult {
   verified: number;
   public: number;
   statuses: Record<string, number>;
+  /** Number of datasets with an IPFS hash. */
+  withIpfs?: number;
+  /** Number of datasets with frozen metadata. */
+  frozen?: number;
+  /** Average quality score across all datasets (0–100). */
+  avgQualityScore?: number;
+  /** Top tags by frequency (up to 10). */
+  topTags?: Array<{ tag: string; count: number }>;
+}
+
+export interface PaginateOptions {
+  /** 1-indexed page number. */
+  page: number;
+  /** Number of items per page. Must be ≥ 1. */
+  pageSize: number;
+}
+
+export interface PaginateResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPrev: boolean;
+  hasNext: boolean;
 }
 
 export interface HealthResult {
@@ -394,6 +421,8 @@ export interface SdkClientOptions {
   storage?: StorageAdapter;
   registry?: RegistryAdapter;
   onchain?: OnChainPublisher;
+  /** Per-request timeout in milliseconds applied by the default HTTP transport. */
+  timeoutMs?: number;
 }
 
 export interface DatasetDiffField {

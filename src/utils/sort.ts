@@ -59,9 +59,7 @@ export function sortDatasets(
     case "size-asc":
       return copy.sort((a, b) => (a.sizeBytes ?? 0) - (b.sizeBytes ?? 0));
 
-    default: {
-      const _exhaustive: never = mode;
-      return copy;
-    }
+    default:
+      return ((_: never) => copy)(mode);
   }
 }

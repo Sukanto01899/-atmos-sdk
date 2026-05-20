@@ -45,13 +45,14 @@ export const runBatch = async <TItem, TResult>(
         const execute = () => worker(item, index);
         const result =
           options?.retries && options.retries > 0
-            ? await withRetry(execute, options.retries, options.retryDelayMs)
+            ? await withRetry(execute, { retries: options.retries, delayMs: options.retryDelayMs })
             : await execute();
         results[index] = { item, status: "fulfilled", result };
         succeeded += 1;
       } catch (error) {
         results[index] = { item, status: "rejected", error };
         failed += 1;
+        options?.onError?.(error, index);
         if (options?.stopOnError) {
           stop = true;
         }

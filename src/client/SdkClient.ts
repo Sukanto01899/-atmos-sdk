@@ -1038,4 +1038,89 @@ export class SdkClient {
 
     return this.transport.request("GET", `/summary${qs}`);
   }
+
+  /**
+   * Fetch a single dataset by ID, returning `null` instead of throwing when
+   * the server responds with 404.
+   *
+   * @example
+   * const ds = await sdk.findById("42");
+   * if (!ds) console.log("Not found");
+   */
+  async findById(id: DatasetId): Promise<DatasetMetadata | null> {
+    try {
+      return await this.getMetadata(id);
+    } catch (err: unknown) {
+      if (err instanceof SdkError && err.status === 404) return null;
+      throw err;
+    }
+  }
+
+  /**
+   * Fetch all datasets belonging to `owner`. Convenience wrapper around
+   * `listDatasetsAll` that sets `owner` and surfaces a flat array.
+   *
+   * @example
+   * const mine = await sdk.findByOwner("SP1K2XGT5RNGT…");
+   */
+  async findByOwner(
+    owner: string,
+    options?: Omit<ListDatasetsAllOptions, "owner">,
+  ): Promise<DatasetMetadata[]> {
+    const result = await this.listDatasetsAll({ ...options, owner });
+    return result.items;
+  }
+
+  /**
+   * Return the total number of datasets matching `options` without fetching
+   * their full metadata. Sends a single page request with `limit=1` and reads
+   * the `total` field from the response, falling back to `listDatasetsAll`
+   * when the server does not return a `total`.
+   *
+   * @example
+   * const total = await sdk.count({ status: "verified" });
+   */
+  async count(options?: Omit<ListDatasetsOptions, "limit" | "cursor">): Promise<number> {
+    const qs = toQueryString(this.buildDatasetQuery({ ...options, limit: 1 }));
+    const result = await this.transport.request<ListDatasetsResult & { total?: number }>(
+      "GET",
+      `/datasets${qs}`,
+    );
+    if (typeof result.total === "number") return result.total;
+    // Fallback: fetch everything and count.
+    const all = await this.listDatasetsAll(options);
+    return all.items.length;
+  }
+
+  /**
+   * Pre-populate the metadata cache for a list of dataset IDs. Useful when
+   * you know in advance which datasets will be needed and want to avoid
+   * per-ID round-trips during rendering.
+   *
+   * Requests are sent concurrently (up to 6 in flight at a time). IDs that
+   * fail are silently skipped so one 404 doesn't abort the whole batch.
+   *
+   * @example
+   * await sdk.prewarmCache(["1", "2", "3"]);
+   */
+  async prewarmCache(ids: DatasetId[]): Promise<void> {
+    const CONCURRENCY = 6;
+    let index = 0;
+
+    const worker = async () => {
+      while (index < ids.length) {
+        const id = ids[index++];
+        if (!id) continue;
+        try {
+          await this.getMetadata(id);
+        } catch {
+          // Skip silently — prewarm is best-effort.
+        }
+      }
+    };
+
+    await Promise.all(
+      Array.from({ length: Math.min(CONCURRENCY, ids.length) }, () => worker()),
+    );
+  }
 }

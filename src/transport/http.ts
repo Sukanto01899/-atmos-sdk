@@ -35,23 +35,53 @@ export const httpTransport = (options: SdkClientOptions): Transport => ({
       headers.authorization = `Bearer ${token}`;
     }
 
+    // Merge caller's AbortSignal with an optional per-request timeout signal.
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let signal = req?.signal;
+
+    if (options.timeoutMs && options.timeoutMs > 0) {
+      const controller = new AbortController();
+      timeoutId = setTimeout(() => controller.abort(), options.timeoutMs);
+
+      if (req?.signal) {
+        // Forward external abort into our controller.
+        req.signal.addEventListener("abort", () => controller.abort(), { once: true });
+      }
+      signal = controller.signal;
+    }
+
     let response: Response;
     try {
       response = await fetch(url, {
         method,
         headers,
-        body: hasJsonBody ? JSON.stringify(req.body) : undefined,
-        signal: req?.signal,
+        body: hasJsonBody ? JSON.stringify(req?.body) : undefined,
+        signal,
       });
     } catch (error: unknown) {
-      throw new SdkError("E_HTTP", "Network request failed.", 0, { url, error });
+      const isTimeout =
+        error instanceof DOMException && error.name === "AbortError" && options.timeoutMs
+          ? true
+          : false;
+      throw new SdkError(
+        isTimeout ? "E_TIMEOUT" : "E_HTTP",
+        isTimeout
+          ? `Request timed out after ${options.timeoutMs}ms.`
+          : "Network request failed.",
+        0,
+        { url, error },
+      );
+    } finally {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
     }
 
     if (!response.ok) {
-      const text = await response.text();
+      const text = await response.text().catch(() => "");
       throw new SdkError(
         "E_HTTP",
-        `Request failed with ${response.status}`,
+        `Request failed with ${response.status}${text ? `: ${text.slice(0, 200)}` : ""}`,
         response.status,
         text,
       );

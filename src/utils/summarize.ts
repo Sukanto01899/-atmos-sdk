@@ -1,4 +1,5 @@
 import type { DatasetMetadata, SummaryResult } from "../types";
+import { getDatasetQualityScore } from "./quality";
 
 /**
  * Compute summary statistics from a local array of datasets.
@@ -7,15 +8,23 @@ import type { DatasetMetadata, SummaryResult } from "../types";
  * interchangeable — use this when the datasets are already loaded and
  * you want to avoid an extra network round-trip.
  *
+ * Adds extra optional fields (`withIpfs`, `frozen`, `avgQualityScore`,
+ * `topTags`) that the server-side summary endpoint may not return.
+ *
  * @example
  * const { items } = await sdk.listDatasetsAll();
  * const stats = summarizeDatasets(items);
- * console.log(stats.total, stats.verified, stats.statuses);
+ * console.log(stats.total, stats.verified, stats.avgQualityScore);
+ * console.log(stats.topTags); // [{ tag: "climate", count: 12 }, …]
  */
 export function summarizeDatasets(datasets: DatasetMetadata[]): SummaryResult {
   const statuses: Record<string, number> = {};
+  const tagCounts: Record<string, number> = {};
   let verified = 0;
   let pub = 0;
+  let withIpfs = 0;
+  let frozen = 0;
+  let totalQuality = 0;
 
   for (const ds of datasets) {
     const status = ds.status ?? "unknown";
@@ -23,9 +32,35 @@ export function summarizeDatasets(datasets: DatasetMetadata[]): SummaryResult {
 
     if (ds.verified === true || ds.status === "verified") verified += 1;
     if (ds.isPublic === true) pub += 1;
+    if (ds.ipfsHash && String(ds.ipfsHash).trim()) withIpfs += 1;
+    if (ds.metadataFrozen === true) frozen += 1;
+    totalQuality += getDatasetQualityScore(ds);
+
+    for (const tag of ds.tags ?? []) {
+      tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+    }
   }
 
-  return { total: datasets.length, verified, public: pub, statuses };
+  const topTags = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([tag, count]) => ({ tag, count }));
+
+  const avgQualityScore =
+    datasets.length > 0
+      ? Math.round((totalQuality / datasets.length) * 10) / 10
+      : 0;
+
+  return {
+    total: datasets.length,
+    verified,
+    public: pub,
+    statuses,
+    withIpfs,
+    frozen,
+    avgQualityScore,
+    topTags,
+  };
 }
 
 /**
