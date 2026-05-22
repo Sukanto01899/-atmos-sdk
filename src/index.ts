@@ -185,3 +185,5 @@ export {
 export { pickDatasets } from "./utils/pickDatasets";
 export { mergeDatasets } from "./utils/mergeDatasets";
 export type { MergeDatasetsOptions } from "./utils/mergeDatasets";
+export { scoreDatasets } from "./utils/scoreDatasets";
+export type { ScoredDataset } from "./utils/scoreDatasets";
