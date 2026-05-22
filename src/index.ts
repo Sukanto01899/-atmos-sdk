@@ -174,3 +174,14 @@ export { getRecentDatasets } from "./utils/recentDatasets";
 export type { RecentDatasetsOptions } from "./utils/recentDatasets";
 export { filterByTag } from "./utils/filterByTag";
 export type { FilterByTagOptions } from "./utils/filterByTag";
+export {
+  isVerifiedDataset,
+  isPublicDataset,
+  hasIpfsHash,
+  isFrozenDataset,
+  isActiveDataset,
+  isDeprecatedDataset,
+} from "./utils/predicates";
+export { pickDatasets } from "./utils/pickDatasets";
+export { mergeDatasets } from "./utils/mergeDatasets";
+export type { MergeDatasetsOptions } from "./utils/mergeDatasets";

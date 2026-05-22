@@ -1,0 +1,37 @@
+import type { DatasetMetadata } from "../types";
+
+/** Returns `true` if the dataset is verified. */
+export const isVerifiedDataset = (ds: DatasetMetadata): boolean =>
+  ds.verified === true || ds.status === "verified";
+
+/** Returns `true` if the dataset is publicly accessible. */
+export const isPublicDataset = (ds: DatasetMetadata): boolean =>
+  ds.isPublic === true;
+
+/** Returns `true` if the dataset has a non-empty IPFS hash. */
+export const hasIpfsHash = (ds: DatasetMetadata): boolean =>
+  Boolean(ds.ipfsHash?.trim());
+
+/** Returns `true` if the dataset metadata is frozen (immutable). */
+export const isFrozenDataset = (ds: DatasetMetadata): boolean =>
+  ds.metadataFrozen === true;
+
+/** Returns `true` if the dataset status is "active". */
+export const isActiveDataset = (ds: DatasetMetadata): boolean =>
+  ds.status === "active";
+
+/** Returns `true` if the dataset status is "deprecated". */
+export const isDeprecatedDataset = (ds: DatasetMetadata): boolean =>
+  ds.status === "deprecated";
+
+/**
+ * Composable boolean predicates for filtering datasets.
+ *
+ * @example
+ * const verifiedPublic = items.filter(
+ *   (ds) => isVerifiedDataset(ds) && isPublicDataset(ds)
+ * );
+ *
+ * @example
+ * const withIpfs = items.filter(hasIpfsHash);
+ */
