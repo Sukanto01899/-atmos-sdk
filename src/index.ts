@@ -175,6 +175,7 @@ export { getCoordBounds } from "./utils/coordBounds";
 export { getAltitudeRange } from "./utils/altitudeRange";
 export type { AltitudeRange } from "./utils/altitudeRange";
 export { countByStatus } from "./utils/countByStatus";
+export { countByOwner } from "./utils/countByOwner";
 export { getRecentDatasets } from "./utils/recentDatasets";
 export type { RecentDatasetsOptions } from "./utils/recentDatasets";
 export { filterByTag } from "./utils/filterByTag";
