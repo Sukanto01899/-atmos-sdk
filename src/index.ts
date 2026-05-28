@@ -138,6 +138,11 @@ export type {
   DatasetCitationOptions,
 } from "./utils/citation";
 export { getDatasetQualityScore } from "./utils/quality";
+export { getDatasetCompletenessScore } from "./utils/completeness";
+export type {
+  DatasetCompletenessField,
+  DatasetCompletenessResult,
+} from "./utils/completeness";
 export { compareDatasetStatusPriority, getDatasetStatusPriority } from "./utils/status";
 export { datasetsToCsv } from "./utils/datasetsCsv";
 export type { CsvCell, DatasetsCsvOptions } from "./utils/datasetsCsv";
@@ -174,6 +179,8 @@ export { getRecentDatasets } from "./utils/recentDatasets";
 export type { RecentDatasetsOptions } from "./utils/recentDatasets";
 export { filterByTag } from "./utils/filterByTag";
 export type { FilterByTagOptions } from "./utils/filterByTag";
+export { getUniqueTags } from "./utils/getUniqueTags";
+export type { GetUniqueTagsOptions } from "./utils/getUniqueTags";
 export {
   isVerifiedDataset,
   isPublicDataset,
