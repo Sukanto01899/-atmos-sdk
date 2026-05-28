@@ -189,6 +189,7 @@ export {
   isFrozenDataset,
   isActiveDataset,
   isDeprecatedDataset,
+  hasTag,
 } from "./utils/predicates";
 export { pickDatasets } from "./utils/pickDatasets";
 export { mergeDatasets } from "./utils/mergeDatasets";

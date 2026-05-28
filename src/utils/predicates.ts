@@ -25,6 +25,29 @@ export const isDeprecatedDataset = (ds: DatasetMetadata): boolean =>
   ds.status === "deprecated";
 
 /**
+ * Returns `true` if the dataset has the given tag.
+ *
+ * @example
+ * const climate = items.filter((ds) => hasTag(ds, "climate"));
+ *
+ * @example
+ * // Case-insensitive
+ * const csv = items.filter((ds) => hasTag(ds, "CSV", { caseInsensitive: true }));
+ */
+export function hasTag(
+  ds: DatasetMetadata,
+  tag: string,
+  options?: { caseInsensitive?: boolean },
+): boolean {
+  const tags = ds.tags ?? [];
+  if (options?.caseInsensitive) {
+    const needle = tag.toLowerCase();
+    return tags.some((t) => t.toLowerCase() === needle);
+  }
+  return tags.includes(tag);
+}
+
+/**
  * Composable boolean predicates for filtering datasets.
  *
  * @example
