@@ -164,6 +164,7 @@ export type {
   DatasetWithinRadiusEntry,
   DatasetsWithinRadiusOptions,
 } from "./utils/withinRadius";
+export { datasetsWithinBbox } from "./utils/withinBbox";
 export { sampleDatasets } from "./utils/sample";
 export { searchDatasets } from "./utils/search";
 export type { SearchResult } from "./utils/search";
