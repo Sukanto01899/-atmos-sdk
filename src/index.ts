@@ -159,6 +159,11 @@ export { paginateDatasets } from "./utils/paginate";
 export { deduplicateDatasets } from "./utils/dedupe";
 export { nearestDatasets } from "./utils/nearest";
 export type { NearestDatasetEntry } from "./utils/nearest";
+export { datasetsWithinRadius } from "./utils/withinRadius";
+export type {
+  DatasetWithinRadiusEntry,
+  DatasetsWithinRadiusOptions,
+} from "./utils/withinRadius";
 export { sampleDatasets } from "./utils/sample";
 export { searchDatasets } from "./utils/search";
 export type { SearchResult } from "./utils/search";
