@@ -137,6 +137,11 @@ export type {
   DatasetCitationMarkdownOptions,
   DatasetCitationOptions,
 } from "./utils/citation";
+export { validateDatasetMetadata } from "./utils/validate";
+export type {
+  DatasetMetadataValidationError,
+  DatasetMetadataValidationResult,
+} from "./utils/validate";
 export { getDatasetQualityScore } from "./utils/quality";
 export { getDatasetCompletenessScore } from "./utils/completeness";
 export type {
