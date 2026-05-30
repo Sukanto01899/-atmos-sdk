@@ -151,6 +151,8 @@ export type {
 export { compareDatasetStatusPriority, getDatasetStatusPriority } from "./utils/status";
 export { datasetsToCsv } from "./utils/datasetsCsv";
 export type { CsvCell, DatasetsCsvOptions } from "./utils/datasetsCsv";
+export { datasetsToJsonl } from "./utils/jsonl";
+export type { DatasetsJsonlOptions } from "./utils/jsonl";
 export {
   computeSha256AndSize,
   readToArrayBuffer,
