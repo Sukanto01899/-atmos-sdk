@@ -178,6 +178,8 @@ export { countByDataType } from "./utils/countByDataType";
 export { getTopDatasets } from "./utils/topDatasets";
 export type { TopDatasetsOptions } from "./utils/topDatasets";
 export { getCoordBounds } from "./utils/coordBounds";
+export { getDatasetsCentroid } from "./utils/centroid";
+export type { DatasetsCentroid } from "./utils/centroid";
 export { getAltitudeRange } from "./utils/altitudeRange";
 export type { AltitudeRange } from "./utils/altitudeRange";
 export { countByStatus } from "./utils/countByStatus";
