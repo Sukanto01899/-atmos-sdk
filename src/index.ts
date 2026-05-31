@@ -197,6 +197,8 @@ export { filterByTag } from "./utils/filterByTag";
 export type { FilterByTagOptions } from "./utils/filterByTag";
 export { getUniqueTags } from "./utils/getUniqueTags";
 export type { GetUniqueTagsOptions } from "./utils/getUniqueTags";
+export { groupDatasetsByTag } from "./utils/groupByTag";
+export type { GroupDatasetsByTagOptions } from "./utils/groupByTag";
 export {
   isVerifiedDataset,
   isPublicDataset,
