@@ -189,6 +189,8 @@ export { getDatasetsCentroid } from "./utils/centroid";
 export type { DatasetsCentroid } from "./utils/centroid";
 export { getAltitudeRange } from "./utils/altitudeRange";
 export type { AltitudeRange } from "./utils/altitudeRange";
+export { getDatasetTimeExtent } from "./utils/timeExtent";
+export type { DatasetTimeExtent, DatasetTimeField } from "./utils/timeExtent";
 export { countByStatus } from "./utils/countByStatus";
 export { countByOwner } from "./utils/countByOwner";
 export { getRecentDatasets } from "./utils/recentDatasets";
