@@ -206,6 +206,7 @@ export {
   isDeprecatedDataset,
   hasTag,
 } from "./utils/predicates";
+export { partitionDatasets } from "./utils/partition";
 export { pickDatasets } from "./utils/pickDatasets";
 export { mergeDatasets } from "./utils/mergeDatasets";
 export type { MergeDatasetsOptions } from "./utils/mergeDatasets";
