@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  getDatasetQualityBreakdown,
   getDatasetQualityGrade,
   getDatasetQualityScore,
   qualityScoreToGrade,
@@ -103,6 +104,43 @@ describe("getDatasetQualityGrade", () => {
     });
 
     expect(rating).toEqual({ score: 75, grade: "B", label: "Good" });
+  });
+});
+
+describe("getDatasetQualityBreakdown", () => {
+  test("itemizes all components for a fully-qualified dataset", () => {
+    const breakdown = getDatasetQualityBreakdown({
+      ...baseMetadata(),
+      status: "verified",
+      ipfsHash: "QmHash",
+      metadataFrozen: true,
+      isPublic: true,
+    });
+
+    expect(breakdown.score).toBe(100);
+    expect(breakdown.maxScore).toBe(100);
+    expect(breakdown.components.every((c) => c.earned)).toBe(true);
+    expect(breakdown.components.map((c) => c.points)).toEqual([45, 30, 15, 10]);
+  });
+
+  test("marks unearned components and sums only earned points", () => {
+    const breakdown = getDatasetQualityBreakdown({
+      ...baseMetadata(),
+      verified: true,
+      ipfsHash: "QmHash",
+    });
+
+    expect(breakdown.score).toBe(75);
+    expect(breakdown.maxScore).toBe(100);
+    const earned = breakdown.components.filter((c) => c.earned).map((c) => c.label);
+    expect(earned).toEqual(["Verified on-chain", "IPFS hash linked"]);
+  });
+
+  test("score matches getDatasetQualityScore", () => {
+    const metadata = { ...baseMetadata(), metadataFrozen: true, isPublic: true };
+    expect(getDatasetQualityBreakdown(metadata).score).toBe(
+      getDatasetQualityScore(metadata),
+    );
   });
 });
 

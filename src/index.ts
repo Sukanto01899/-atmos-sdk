@@ -66,6 +66,7 @@ export type { DatasetSortMode } from "./utils/sort";
 export { filterDatasets } from "./utils/filter";
 export { describeFilters } from "./utils/describeFilters";
 export type { DescribeFiltersOptions } from "./utils/describeFilters";
+export { mergeFilters } from "./utils/mergeFilters";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";
@@ -145,11 +146,17 @@ export type {
   DatasetMetadataValidationResult,
 } from "./utils/validate";
 export {
+  getDatasetQualityBreakdown,
   getDatasetQualityGrade,
   getDatasetQualityScore,
   qualityScoreToGrade,
 } from "./utils/quality";
-export type { DatasetQualityGrade, DatasetQualityRating } from "./utils/quality";
+export type {
+  DatasetQualityBreakdown,
+  DatasetQualityComponent,
+  DatasetQualityGrade,
+  DatasetQualityRating,
+} from "./utils/quality";
 export { getDatasetCompletenessScore } from "./utils/completeness";
 export type {
   DatasetCompletenessField,
@@ -177,6 +184,7 @@ export type {
   DuplicateSignal,
   FindDuplicatesOptions,
 } from "./utils/findDuplicates";
+export { pickCanonicalDataset } from "./utils/pickCanonical";
 export { nearestDatasets } from "./utils/nearest";
 export type { NearestDatasetEntry } from "./utils/nearest";
 export { datasetsWithinRadius } from "./utils/withinRadius";
