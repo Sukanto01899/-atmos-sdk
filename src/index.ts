@@ -64,6 +64,8 @@ export type { FormatRelativeTimeOptions } from "./utils/relativeTime";
 export { sortDatasets } from "./utils/sort";
 export type { DatasetSortMode } from "./utils/sort";
 export { filterDatasets } from "./utils/filter";
+export { describeFilters } from "./utils/describeFilters";
+export type { DescribeFiltersOptions } from "./utils/describeFilters";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";
@@ -169,6 +171,12 @@ export { parseCsvWithHeader } from "./utils/csv";
 export { inferSchema } from "./utils/schema";
 export { paginateDatasets } from "./utils/paginate";
 export { deduplicateDatasets } from "./utils/dedupe";
+export { findDuplicateDatasets } from "./utils/findDuplicates";
+export type {
+  DuplicateGroup,
+  DuplicateSignal,
+  FindDuplicatesOptions,
+} from "./utils/findDuplicates";
 export { nearestDatasets } from "./utils/nearest";
 export type { NearestDatasetEntry } from "./utils/nearest";
 export { datasetsWithinRadius } from "./utils/withinRadius";
