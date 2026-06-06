@@ -67,6 +67,8 @@ export { filterDatasets } from "./utils/filter";
 export { describeFilters } from "./utils/describeFilters";
 export type { DescribeFiltersOptions } from "./utils/describeFilters";
 export { mergeFilters } from "./utils/mergeFilters";
+export { diffFilters } from "./utils/diffFilters";
+export type { FilterChange } from "./utils/diffFilters";
 export { SdkError } from "./types";
 export { createIpfsAdapter } from "./storage/ipfs";
 export type { IpfsAdapterOptions } from "./storage/ipfs";
@@ -210,6 +212,12 @@ export { getDatasetsCentroid } from "./utils/centroid";
 export type { DatasetsCentroid } from "./utils/centroid";
 export { getAltitudeRange } from "./utils/altitudeRange";
 export type { AltitudeRange } from "./utils/altitudeRange";
+export {
+  ATMOSPHERIC_LAYERS,
+  classifyAltitude,
+  getDatasetAltitudeBand,
+} from "./utils/altitudeBand";
+export type { AltitudeBand } from "./utils/altitudeBand";
 export { getDatasetTimeExtent } from "./utils/timeExtent";
 export type { DatasetTimeExtent, DatasetTimeField } from "./utils/timeExtent";
 export { countByStatus } from "./utils/countByStatus";
@@ -220,8 +228,12 @@ export { filterByTag } from "./utils/filterByTag";
 export type { FilterByTagOptions } from "./utils/filterByTag";
 export { getUniqueTags } from "./utils/getUniqueTags";
 export type { GetUniqueTagsOptions } from "./utils/getUniqueTags";
+export { normalizeTags } from "./utils/normalizeTags";
+export type { NormalizeTagsOptions } from "./utils/normalizeTags";
 export { groupDatasetsByTag } from "./utils/groupByTag";
 export type { GroupDatasetsByTagOptions } from "./utils/groupByTag";
+export { groupDatasetsByYear } from "./utils/groupByYear";
+export type { GroupByYearOptions } from "./utils/groupByYear";
 export {
   isVerifiedDataset,
   isPublicDataset,
