@@ -142,7 +142,12 @@ export type {
   DatasetMetadataValidationError,
   DatasetMetadataValidationResult,
 } from "./utils/validate";
-export { getDatasetQualityScore } from "./utils/quality";
+export {
+  getDatasetQualityGrade,
+  getDatasetQualityScore,
+  qualityScoreToGrade,
+} from "./utils/quality";
+export type { DatasetQualityGrade, DatasetQualityRating } from "./utils/quality";
 export { getDatasetCompletenessScore } from "./utils/completeness";
 export type {
   DatasetCompletenessField,

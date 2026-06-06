@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { getDatasetQualityScore } from "../src/utils/quality";
+import {
+  getDatasetQualityGrade,
+  getDatasetQualityScore,
+  qualityScoreToGrade,
+} from "../src/utils/quality";
 import type { DatasetMetadata } from "../src/types";
 
 const baseMetadata = (): DatasetMetadata => ({
@@ -49,6 +53,56 @@ describe("getDatasetQualityScore", () => {
     });
 
     expect(score).toBe(10);
+  });
+});
+
+describe("qualityScoreToGrade", () => {
+  test("maps scores to letter grades at each threshold", () => {
+    expect(qualityScoreToGrade(100)).toBe("A");
+    expect(qualityScoreToGrade(90)).toBe("A");
+    expect(qualityScoreToGrade(89)).toBe("B");
+    expect(qualityScoreToGrade(75)).toBe("B");
+    expect(qualityScoreToGrade(74)).toBe("C");
+    expect(qualityScoreToGrade(50)).toBe("C");
+    expect(qualityScoreToGrade(49)).toBe("D");
+    expect(qualityScoreToGrade(25)).toBe("D");
+    expect(qualityScoreToGrade(24)).toBe("F");
+    expect(qualityScoreToGrade(0)).toBe("F");
+  });
+
+  test("clamps out-of-range scores", () => {
+    expect(qualityScoreToGrade(-10)).toBe("F");
+    expect(qualityScoreToGrade(150)).toBe("A");
+  });
+});
+
+describe("getDatasetQualityGrade", () => {
+  test("grades a fully-qualified dataset as A / Excellent", () => {
+    const rating = getDatasetQualityGrade({
+      ...baseMetadata(),
+      status: "verified",
+      ipfsHash: "QmHash",
+      metadataFrozen: true,
+      isPublic: true,
+    });
+
+    expect(rating).toEqual({ score: 100, grade: "A", label: "Excellent" });
+  });
+
+  test("grades a bare dataset as F / Minimal", () => {
+    const rating = getDatasetQualityGrade(baseMetadata());
+
+    expect(rating).toEqual({ score: 0, grade: "F", label: "Minimal" });
+  });
+
+  test("grades verified + ipfs as B / Good", () => {
+    const rating = getDatasetQualityGrade({
+      ...baseMetadata(),
+      verified: true,
+      ipfsHash: "QmHash",
+    });
+
+    expect(rating).toEqual({ score: 75, grade: "B", label: "Good" });
   });
 });
 
