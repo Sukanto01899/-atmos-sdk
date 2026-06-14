@@ -4,31 +4,14 @@ export type CsvCell = string | number | boolean | null | undefined;
 
 export type DatasetsCsvOptions = {
   includeHeader?: boolean;
-  /**
-   * Column order for the CSV. Defaults to a stable, human-friendly subset.
-   */
-  columns?: Array<
-    | "id"
-    | "name"
-    | "dataType"
-    | "status"
-    | "isPublic"
-    | "owner"
-    | "collectionDate"
-    | "createdAt"
-    | "latitude"
-    | "longitude"
-    | "altitudeMin"
-    | "altitudeMax"
-    | "ipfsHash"
-    | "verified"
-    | "metadataFrozen"
-  >;
+  /** Column order for the CSV. Accepts any field name; defaults to a stable human-friendly subset. */
+  columns?: string[];
 };
 
-const DEFAULT_COLUMNS: NonNullable<DatasetsCsvOptions["columns"]> = [
+const DEFAULT_COLUMNS: string[] = [
   "id",
   "name",
+  "description",
   "dataType",
   "status",
   "isPublic",
@@ -55,22 +38,8 @@ const escapeCsvCell = (cell: CsvCell): string => {
 
 const toRow = (metadata: DatasetMetadata, columns: string[]): CsvCell[] =>
   columns.map((column) => {
-    if (column === "id") return metadata.id ?? "";
-    if (column === "name") return metadata.name;
-    if (column === "dataType") return metadata.dataType;
-    if (column === "status") return metadata.status ?? "";
-    if (column === "isPublic") return metadata.isPublic;
-    if (column === "owner") return metadata.owner ?? "";
-    if (column === "collectionDate") return metadata.collectionDate;
-    if (column === "createdAt") return metadata.createdAt ?? "";
-    if (column === "latitude") return metadata.latitude;
-    if (column === "longitude") return metadata.longitude;
-    if (column === "altitudeMin") return metadata.altitudeMin;
-    if (column === "altitudeMax") return metadata.altitudeMax;
-    if (column === "ipfsHash") return metadata.ipfsHash ?? "";
-    if (column === "verified") return metadata.verified ?? "";
-    if (column === "metadataFrozen") return metadata.metadataFrozen ?? "";
-    return "";
+    const value = (metadata as unknown as Record<string, unknown>)[column];
+    return (value === undefined ? "" : value) as CsvCell;
   });
 
 export const datasetsToCsv = (

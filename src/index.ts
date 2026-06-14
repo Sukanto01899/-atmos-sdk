@@ -167,6 +167,8 @@ export type {
 export { compareDatasetStatusPriority, getDatasetStatusPriority } from "./utils/status";
 export { datasetsToCsv } from "./utils/datasetsCsv";
 export type { CsvCell, DatasetsCsvOptions } from "./utils/datasetsCsv";
+export { exportDatasets } from "./utils/exportDatasets";
+export type { ExportFormat, ExportDatasetsOptions } from "./utils/exportDatasets";
 export { datasetsToJsonl } from "./utils/jsonl";
 export type { DatasetsJsonlOptions } from "./utils/jsonl";
 export {

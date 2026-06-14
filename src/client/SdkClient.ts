@@ -64,6 +64,11 @@ import {
 } from "../utils/stacksExplorer";
 import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../utils/citation";
 import { getDatasetQualityScore } from "../utils/quality";
+import {
+  exportDatasets as exportDatasetsUtil,
+  type ExportFormat,
+  type ExportDatasetsOptions,
+} from "../utils/exportDatasets";
 
 export class SdkClient {
   private readonly baseUrl;
@@ -1192,5 +1197,23 @@ export class SdkClient {
     };
     await Promise.all(Array.from({ length: Math.min(CONCURRENCY, cids.length) }, () => worker()));
     return results;
+  }
+
+  /**
+   * Serialize a dataset collection into a downloadable `Blob`.
+   *
+   * Delegates to the standalone `exportDatasets` utility. Prefer calling that
+   * function directly when you do not need a fully configured `SdkClient`.
+   *
+   * @example
+   * const blob = sdk.exportDatasets(items, "csv");
+   * const blob = sdk.exportDatasets(items, "json", { meta: { source: "mine" } });
+   */
+  exportDatasets(
+    datasets: DatasetMetadata[],
+    format: ExportFormat,
+    options?: ExportDatasetsOptions,
+  ): Blob {
+    return exportDatasetsUtil(datasets, format, options);
   }
 }
