@@ -48,7 +48,7 @@ import { runBatch } from "../utils/batch";
 import { computeSha256AndSize, sha256HexFromText } from "../utils/hash";
 import { toQueryString } from "../utils/query";
 import { parseCsvWithHeader } from "../utils/csv";
-import { toIpfsGatewayUrl, toIpfsUri } from "../utils/ipfs";
+import { normalizeIpfsCid, toIpfsGatewayUrl, toIpfsUri } from "../utils/ipfs";
 import { isValidLatLonDegrees, toLatLonDegreesString, toMicroDegrees } from "../utils/coords";
 import { toGeoUri, type GeoUriOptions } from "../utils/geoUri";
 import { toGoogleMapsUrl, type GoogleMapsOptions } from "../utils/googleMaps";
@@ -1122,5 +1122,75 @@ export class SdkClient {
     await Promise.all(
       Array.from({ length: Math.min(CONCURRENCY, ids.length) }, () => worker()),
     );
+  }
+
+  /**
+   * Check reachability of multiple IPFS hashes in parallel.
+   *
+   * Sends a HEAD request to each configured gateway for every CID. The first
+   * gateway that responds with a 2xx marks the CID as `"ok"`; if all gateways
+   * fail or time out it is marked `"fail"`.
+   *
+   * @example
+   * const health = await sdk.checkIpfsBatch(["Qm...", "bafyb..."]);
+   * health.forEach((status, cid) => console.log(cid, status));
+   */
+  async checkIpfsBatch(
+    hashes: string[],
+    options?: {
+      timeoutMs?: number;
+      concurrency?: number;
+      gatewayUrls?: string[];
+    },
+  ): Promise<Map<string, "ok" | "fail">> {
+    const results = new Map<string, "ok" | "fail">();
+    if (typeof fetch === "undefined" || !Array.isArray(hashes) || hashes.length === 0) {
+      return results;
+    }
+
+    const timeoutMs = Math.max(1_000, options?.timeoutMs ?? 8_000);
+    const gatewayUrls = options?.gatewayUrls ?? [
+      "https://cloudflare-ipfs.com/ipfs/",
+      "https://ipfs.io/ipfs/",
+    ];
+
+    const cidSet = new Set<string>();
+    for (const hash of hashes) {
+      const cid = normalizeIpfsCid(hash);
+      if (cid) cidSet.add(cid);
+    }
+    const cids = Array.from(cidSet);
+    if (cids.length === 0) return results;
+
+    const checkOne = async (cid: string): Promise<void> => {
+      for (const base of gatewayUrls) {
+        const url = `${base}${encodeURIComponent(cid)}`;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const resp = await fetch(url, { method: "HEAD", signal: controller.signal });
+          if (resp.ok) {
+            results.set(cid, "ok");
+            return;
+          }
+        } catch {
+          // try next gateway
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      results.set(cid, "fail");
+    };
+
+    const CONCURRENCY = Math.max(1, options?.concurrency ?? 4);
+    let index = 0;
+    const worker = async () => {
+      while (index < cids.length) {
+        const cid = cids[index++];
+        if (cid) await checkOne(cid);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(CONCURRENCY, cids.length) }, () => worker()));
+    return results;
   }
 }
