@@ -1077,6 +1077,21 @@ export class SdkClient {
   }
 
   /**
+   * Fetch all datasets tagged with `tag`. Convenience wrapper around
+   * `listDatasetsAll` that sets `tags` and surfaces a flat array.
+   *
+   * @example
+   * const lidar = await sdk.findByTag("lidar");
+   */
+  async findByTag(
+    tag: string,
+    options?: Omit<ListDatasetsAllOptions, "tags">,
+  ): Promise<DatasetMetadata[]> {
+    const result = await this.listDatasetsAll({ ...options, tags: [tag] });
+    return result.items;
+  }
+
+  /**
    * Return the total number of datasets matching `options` without fetching
    * their full metadata. Sends a single page request with `limit=1` and reads
    * the `total` field from the response, falling back to `listDatasetsAll`
