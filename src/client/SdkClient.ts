@@ -1232,6 +1232,24 @@ export class SdkClient {
   }
 
   /**
+   * Check whether a single dataset's IPFS content is reachable.
+   * Fetches metadata to get the `ipfsHash`, then delegates to `checkIpfsBatch`.
+   * Returns `false` when the dataset has no IPFS hash.
+   *
+   * @example
+   * const reachable = await sdk.isIpfsReachable("42");
+   */
+  async isIpfsReachable(
+    id: DatasetId,
+    options?: { timeoutMs?: number; gatewayUrls?: string[] },
+  ): Promise<boolean> {
+    const metadata = await this.getMetadata(id);
+    if (!metadata.ipfsHash) return false;
+    const results = await this.checkIpfsBatch([metadata.ipfsHash], options);
+    return results.get(normalizeIpfsCid(metadata.ipfsHash) ?? metadata.ipfsHash) === "ok";
+  }
+
+  /**
    * Serialize a dataset collection into a downloadable `Blob`.
    *
    * Delegates to the standalone `exportDatasets` utility. Prefer calling that
