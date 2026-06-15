@@ -63,6 +63,7 @@ import {
   type StacksExplorerOptions,
 } from "../utils/stacksExplorer";
 import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../utils/citation";
+import { formatDatasetAge, type FormatRelativeTimeOptions } from "../utils/relativeTime";
 import { getDatasetQualityScore } from "../utils/quality";
 import {
   exportDatasets as exportDatasetsUtil,
@@ -778,6 +779,22 @@ export class SdkClient {
   async getDatasetQualityScore(id: DatasetId): Promise<number> {
     const metadata = await this.getMetadata(id);
     return getDatasetQualityScore(metadata);
+  }
+
+  /**
+   * Return a human-readable age string for a dataset.
+   * Uses `collectionDate` by default, falling back to `createdAt`.
+   *
+   * @example
+   * await sdk.getDatasetAge("42")                          // "14 days ago"
+   * await sdk.getDatasetAge("42", { field: "createdAt" })  // "2 hours ago"
+   */
+  async getDatasetAge(
+    id: DatasetId,
+    options?: FormatRelativeTimeOptions & { field?: "collectionDate" | "createdAt" },
+  ): Promise<string> {
+    const metadata = await this.getMetadata(id);
+    return formatDatasetAge(metadata, options);
   }
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
