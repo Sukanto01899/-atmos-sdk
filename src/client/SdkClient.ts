@@ -64,6 +64,7 @@ import {
 } from "../utils/stacksExplorer";
 import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../utils/citation";
 import { formatDatasetAge, type FormatRelativeTimeOptions } from "../utils/relativeTime";
+import { formatBytes, type FormatBytesOptions } from "../utils/bytes";
 import { getDatasetQualityScore } from "../utils/quality";
 import {
   exportDatasets as exportDatasetsUtil,
@@ -795,6 +796,23 @@ export class SdkClient {
   ): Promise<string> {
     const metadata = await this.getMetadata(id);
     return formatDatasetAge(metadata, options);
+  }
+
+  /**
+   * Return the dataset's `sizeBytes` as a human-readable string (e.g. "2.3 MB").
+   * Returns `null` when `sizeBytes` is absent or invalid.
+   *
+   * @example
+   * await sdk.getDatasetSizeFormatted("42")               // "2.3 MB"
+   * await sdk.getDatasetSizeFormatted("42", { binary: true }) // "2.19 MiB"
+   */
+  async getDatasetSizeFormatted(
+    id: DatasetId,
+    options?: FormatBytesOptions,
+  ): Promise<string | null> {
+    const metadata = await this.getMetadata(id);
+    if (metadata.sizeBytes == null) return null;
+    return formatBytes(metadata.sizeBytes, options);
   }
 
   async getDatasetGeoJsonFeature(id: DatasetId): Promise<DatasetsGeoJsonFeature | null> {
