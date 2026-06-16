@@ -65,6 +65,7 @@ import {
 import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../utils/citation";
 import { formatDatasetAge, type FormatRelativeTimeOptions } from "../utils/relativeTime";
 import { formatBytes, type FormatBytesOptions } from "../utils/bytes";
+import { toGeoJson, type ToGeoJsonOptions } from "../utils/toGeoJson";
 import { getDatasetQualityScore } from "../utils/quality";
 import {
   exportDatasets as exportDatasetsUtil,
@@ -1068,6 +1069,23 @@ export class SdkClient {
   ): Promise<ListDatasetsCsvParsedResult> {
     const csv = await this.listDatasetsCsv(options);
     return parseCsvWithHeader(csv, maxRows);
+  }
+
+  /**
+   * Fetch every matching dataset across all pages and return a single
+   * GeoJSON FeatureCollection. Unlike `listDatasetsGeoJson`, which returns
+   * only one server page, this collects all items first via `listDatasetsAll`.
+   *
+   * @example
+   * const geojson = await sdk.listDatasetsGeoJsonAll({ tags: ["lidar"] });
+   * fs.writeFileSync("out.geojson", JSON.stringify(geojson, null, 2));
+   */
+  async listDatasetsGeoJsonAll(
+    options?: ListDatasetsAllOptions & ToGeoJsonOptions,
+  ): Promise<DatasetsGeoJsonFeatureCollection> {
+    const { includeGeneratedAt, meta, ...listOptions } = options ?? {};
+    const { items } = await this.listDatasetsAll(listOptions);
+    return toGeoJson(items, { includeGeneratedAt, meta });
   }
 
   async listDatasetsGeoJson(
