@@ -790,6 +790,24 @@ export class SdkClient {
    * await sdk.getDatasetAge("42")                          // "14 days ago"
    * await sdk.getDatasetAge("42", { field: "createdAt" })  // "2 hours ago"
    */
+  /**
+   * Fetch a dataset's metadata and return a clean copy ready to pass to
+   * `publish()`. Strips server-assigned fields (`id`, `ipfsHash`, `checksum`,
+   * `sizeBytes`, `createdAt`) so the clone is treated as a new dataset.
+   * Optional `overrides` are merged in last.
+   *
+   * @example
+   * const meta = await sdk.cloneMetadata("42", { name: "My Copy" });
+   * await sdk.publish({ kind: "file", data, metadata: meta });
+   */
+  async cloneMetadata(
+    id: DatasetId,
+    overrides?: Partial<DatasetMetadata>,
+  ): Promise<DatasetMetadata> {
+    const { id: _id, ipfsHash: _ipfsHash, checksum: _checksum, sizeBytes: _sizeBytes, createdAt: _createdAt, ...rest } = await this.getMetadata(id);
+    return { ...rest, ...overrides };
+  }
+
   async getDatasetAge(
     id: DatasetId,
     options?: FormatRelativeTimeOptions & { field?: "collectionDate" | "createdAt" },
