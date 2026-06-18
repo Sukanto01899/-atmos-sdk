@@ -79,6 +79,7 @@ import {
   validateDatasetMetadata,
   type DatasetMetadataValidationResult,
 } from "../utils/validate";
+import { searchDatasets, type SearchResult } from "../utils/search";
 import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
@@ -1213,6 +1214,24 @@ export class SdkClient {
   ): Promise<DatasetMetadata[]> {
     const result = await this.listDatasetsAll({ ...options, tags: [tag] });
     return result.items;
+  }
+
+  /**
+   * Fetch all datasets matching `options` and rank them by relevance to
+   * `query` using local fuzzy scoring (name, description, tags, owner,
+   * checksum). Unlike the server's `search` query param, this returns a
+   * ranked `score` per result so the closest matches sort first.
+   *
+   * @example
+   * const results = await sdk.searchLocal("rainfall");
+   * for (const { dataset, score } of results) console.log(dataset.name, score);
+   */
+  async searchLocal(
+    query: string,
+    options?: ListDatasetsAllOptions,
+  ): Promise<SearchResult[]> {
+    const result = await this.listDatasetsAll(options);
+    return searchDatasets(result.items, query);
   }
 
   /**
