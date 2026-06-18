@@ -68,6 +68,10 @@ import { formatBytes, type FormatBytesOptions } from "../utils/bytes";
 import { toGeoJson, type ToGeoJsonOptions } from "../utils/toGeoJson";
 import { getDatasetQualityScore } from "../utils/quality";
 import {
+  getDatasetCompletenessScore as getDatasetCompletenessScoreUtil,
+  type DatasetCompletenessResult,
+} from "../utils/completeness";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -781,6 +785,21 @@ export class SdkClient {
   async getDatasetQualityScore(id: DatasetId): Promise<number> {
     const metadata = await this.getMetadata(id);
     return getDatasetQualityScore(metadata);
+  }
+
+  /**
+   * Evaluate how completely a dataset's core metadata fields are filled in
+   * (name, description, dataType, collectionDate, coordinates, altitude
+   * range, IPFS hash, tags). Useful for surfacing missing fields before
+   * publishing or for sorting a local list by completeness.
+   *
+   * @example
+   * const { score, total, fields } = await sdk.getDatasetCompletenessScore("42");
+   * console.log(`${score}/${total} fields complete`);
+   */
+  async getDatasetCompletenessScore(id: DatasetId): Promise<DatasetCompletenessResult> {
+    const metadata = await this.getMetadata(id);
+    return getDatasetCompletenessScoreUtil(metadata);
   }
 
   /**
