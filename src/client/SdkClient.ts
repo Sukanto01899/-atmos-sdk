@@ -76,6 +76,10 @@ import {
   type DatasetCompletenessResult,
 } from "../utils/completeness";
 import {
+  validateDatasetMetadata,
+  type DatasetMetadataValidationResult,
+} from "../utils/validate";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -817,6 +821,19 @@ export class SdkClient {
   async getDatasetQualityGrade(id: DatasetId): Promise<DatasetQualityRating> {
     const metadata = await this.getMetadata(id);
     return getDatasetQualityGradeUtil(metadata);
+  }
+
+  /**
+   * Fetch a dataset and run it through `validateDatasetMetadata` as a
+   * pre-flight check — useful before re-publishing or cloning a dataset.
+   *
+   * @example
+   * const { valid, errors } = await sdk.validateMetadataById("42");
+   * if (!valid) console.warn(errors);
+   */
+  async validateMetadataById(id: DatasetId): Promise<DatasetMetadataValidationResult> {
+    const metadata = await this.getMetadata(id);
+    return validateDatasetMetadata(metadata);
   }
 
   /**
