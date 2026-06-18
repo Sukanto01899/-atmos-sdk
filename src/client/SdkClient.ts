@@ -80,6 +80,7 @@ import {
   type DatasetMetadataValidationResult,
 } from "../utils/validate";
 import { searchDatasets, type SearchResult } from "../utils/search";
+import { nearestDatasets, type NearestDatasetEntry } from "../utils/nearest";
 import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
@@ -1232,6 +1233,31 @@ export class SdkClient {
   ): Promise<SearchResult[]> {
     const result = await this.listDatasetsAll(options);
     return searchDatasets(result.items, query);
+  }
+
+  /**
+   * Fetch all datasets matching `options` and return the closest ones to
+   * `(latitude, longitude)`, sorted nearest-first. Datasets without valid
+   * coordinates are placed at the end.
+   *
+   * Note: `nearestLimit` caps the number of *results returned*; the
+   * inherited `limit` (if set) still controls the page size used while
+   * fetching from the server.
+   *
+   * @example
+   * const nearby = await sdk.findNearest(51.5074, -0.1278, { nearestLimit: 5 });
+   * for (const { dataset, distanceMeters } of nearby) {
+   *   console.log(`${dataset.name}: ${(distanceMeters! / 1000).toFixed(1)} km`);
+   * }
+   */
+  async findNearest(
+    latitude: number,
+    longitude: number,
+    options?: ListDatasetsAllOptions & { nearestLimit?: number },
+  ): Promise<NearestDatasetEntry[]> {
+    const { nearestLimit, ...listOptions } = options ?? {};
+    const result = await this.listDatasetsAll(listOptions);
+    return nearestDatasets(result.items, latitude, longitude, nearestLimit);
   }
 
   /**
