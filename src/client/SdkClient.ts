@@ -66,7 +66,11 @@ import { formatDatasetCitationMarkdown, formatDatasetCitationText } from "../uti
 import { formatDatasetAge, type FormatRelativeTimeOptions } from "../utils/relativeTime";
 import { formatBytes, type FormatBytesOptions } from "../utils/bytes";
 import { toGeoJson, type ToGeoJsonOptions } from "../utils/toGeoJson";
-import { getDatasetQualityScore } from "../utils/quality";
+import {
+  getDatasetQualityScore,
+  getDatasetQualityGrade as getDatasetQualityGradeUtil,
+  type DatasetQualityRating,
+} from "../utils/quality";
 import {
   getDatasetCompletenessScore as getDatasetCompletenessScoreUtil,
   type DatasetCompletenessResult,
@@ -800,6 +804,19 @@ export class SdkClient {
   async getDatasetCompletenessScore(id: DatasetId): Promise<DatasetCompletenessResult> {
     const metadata = await this.getMetadata(id);
     return getDatasetCompletenessScoreUtil(metadata);
+  }
+
+  /**
+   * Grade a dataset's quality score (A–F) for at-a-glance display, e.g. a
+   * badge on a dataset card.
+   *
+   * @example
+   * const { score, grade, label } = await sdk.getDatasetQualityGrade("42");
+   * // grade: "B", label: "Good"
+   */
+  async getDatasetQualityGrade(id: DatasetId): Promise<DatasetQualityRating> {
+    const metadata = await this.getMetadata(id);
+    return getDatasetQualityGradeUtil(metadata);
   }
 
   /**
