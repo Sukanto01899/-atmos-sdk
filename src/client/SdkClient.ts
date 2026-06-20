@@ -95,6 +95,10 @@ import {
   type DuplicateGroup,
 } from "../utils/findDuplicates";
 import {
+  getUniqueTags as getUniqueTagsUtil,
+  type GetUniqueTagsOptions,
+} from "../utils/getUniqueTags";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -1322,6 +1326,25 @@ export class SdkClient {
     const { by, coordinatePrecision, ...listOptions } = options ?? {};
     const result = await this.listDatasetsAll(listOptions);
     return findDuplicateDatasetsUtil(result.items, { by, coordinatePrecision });
+  }
+
+  /**
+   * Fetch all datasets matching `options` and collect their unique tags
+   * locally. Unlike `listTags` — which hits the server's `/tags` endpoint and
+   * returns per-tag counts across the whole registry — this works off the
+   * exact filtered set already fetched, useful for building a tag picker
+   * scoped to a specific view.
+   *
+   * @example
+   * const tags = await sdk.getUniqueTags({ owner: "SP1K2X..." });
+   * const popular = await sdk.getUniqueTags({ sort: "count", caseInsensitive: true });
+   */
+  async getUniqueTags(
+    options?: ListDatasetsAllOptions & GetUniqueTagsOptions,
+  ): Promise<string[]> {
+    const { caseInsensitive, sort, ...listOptions } = options ?? {};
+    const result = await this.listDatasetsAll(listOptions);
+    return getUniqueTagsUtil(result.items, { caseInsensitive, sort });
   }
 
   /**
