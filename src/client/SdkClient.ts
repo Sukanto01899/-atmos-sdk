@@ -99,6 +99,10 @@ import {
   type GetUniqueTagsOptions,
 } from "../utils/getUniqueTags";
 import {
+  getDatasetsCentroid as getDatasetsCentroidUtil,
+  type DatasetsCentroid,
+} from "../utils/centroid";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -1345,6 +1349,23 @@ export class SdkClient {
     const { caseInsensitive, sort, ...listOptions } = options ?? {};
     const result = await this.listDatasetsAll(listOptions);
     return getUniqueTagsUtil(result.items, { caseInsensitive, sort });
+  }
+
+  /**
+   * Fetch all datasets matching `options` and compute their geographic
+   * centroid (mean latitude/longitude, midpoint altitude). Useful for
+   * centering a map view on a filtered result set. Returns `null` when no
+   * matching dataset has valid coordinates.
+   *
+   * @example
+   * const center = await sdk.getDatasetsCentroid({ tags: ["lidar"] });
+   * if (center) map.setView([center.latitude, center.longitude]);
+   */
+  async getDatasetsCentroid(
+    options?: ListDatasetsAllOptions,
+  ): Promise<DatasetsCentroid | null> {
+    const result = await this.listDatasetsAll(options);
+    return getDatasetsCentroidUtil(result.items);
   }
 
   /**
