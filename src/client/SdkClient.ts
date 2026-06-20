@@ -86,6 +86,10 @@ import {
   type RecentDatasetsOptions,
 } from "../utils/recentDatasets";
 import {
+  getTopDatasets as getTopDatasetsUtil,
+  type TopDatasetsOptions,
+} from "../utils/topDatasets";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -1279,6 +1283,23 @@ export class SdkClient {
     const { dateField, ...listOptions } = options ?? {};
     const result = await this.listDatasetsAll(listOptions);
     return getRecentDatasetsUtil(result.items, n, { dateField });
+  }
+
+  /**
+   * Fetch all datasets matching `options` and return the top `n` ranked by
+   * quality score, highest first.
+   *
+   * @example
+   * const best = await sdk.getTopDatasets(5);
+   * const verified = await sdk.getTopDatasets(10, { minScore: 70 });
+   */
+  async getTopDatasets(
+    n: number,
+    options?: ListDatasetsAllOptions & TopDatasetsOptions,
+  ): Promise<DatasetMetadata[]> {
+    const { order, minScore, ...listOptions } = options ?? {};
+    const result = await this.listDatasetsAll(listOptions);
+    return getTopDatasetsUtil(result.items, n, { order, minScore });
   }
 
   /**
