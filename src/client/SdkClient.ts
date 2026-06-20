@@ -90,6 +90,11 @@ import {
   type TopDatasetsOptions,
 } from "../utils/topDatasets";
 import {
+  findDuplicateDatasets as findDuplicateDatasetsUtil,
+  type FindDuplicatesOptions,
+  type DuplicateGroup,
+} from "../utils/findDuplicates";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -1300,6 +1305,23 @@ export class SdkClient {
     const { order, minScore, ...listOptions } = options ?? {};
     const result = await this.listDatasetsAll(listOptions);
     return getTopDatasetsUtil(result.items, n, { order, minScore });
+  }
+
+  /**
+   * Fetch all datasets matching `options` and group ones that are likely
+   * duplicates of one another (by name, coordinates, and/or IPFS hash).
+   * Useful for surfacing accidental re-registrations in an open registry.
+   *
+   * @example
+   * const dupes = await sdk.findDuplicateDatasets();
+   * const looser = await sdk.findDuplicateDatasets({ by: ["name", "coordinates"] });
+   */
+  async findDuplicateDatasets(
+    options?: ListDatasetsAllOptions & FindDuplicatesOptions,
+  ): Promise<DuplicateGroup[]> {
+    const { by, coordinatePrecision, ...listOptions } = options ?? {};
+    const result = await this.listDatasetsAll(listOptions);
+    return findDuplicateDatasetsUtil(result.items, { by, coordinatePrecision });
   }
 
   /**
