@@ -82,6 +82,10 @@ import {
 import { searchDatasets, type SearchResult } from "../utils/search";
 import { nearestDatasets, type NearestDatasetEntry } from "../utils/nearest";
 import {
+  getRecentDatasets as getRecentDatasetsUtil,
+  type RecentDatasetsOptions,
+} from "../utils/recentDatasets";
+import {
   exportDatasets as exportDatasetsUtil,
   type ExportFormat,
   type ExportDatasetsOptions,
@@ -1258,6 +1262,23 @@ export class SdkClient {
     const { nearestLimit, ...listOptions } = options ?? {};
     const result = await this.listDatasetsAll(listOptions);
     return nearestDatasets(result.items, latitude, longitude, nearestLimit);
+  }
+
+  /**
+   * Fetch all datasets matching `options` and return the `n` most recently
+   * dated ones, sorted newest-first.
+   *
+   * @example
+   * const latest = await sdk.getRecentDatasets(10);
+   * const newest = await sdk.getRecentDatasets(5, { dateField: "createdAt" });
+   */
+  async getRecentDatasets(
+    n: number,
+    options?: ListDatasetsAllOptions & RecentDatasetsOptions,
+  ): Promise<DatasetMetadata[]> {
+    const { dateField, ...listOptions } = options ?? {};
+    const result = await this.listDatasetsAll(listOptions);
+    return getRecentDatasetsUtil(result.items, n, { dateField });
   }
 
   /**
