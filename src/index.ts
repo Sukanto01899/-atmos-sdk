@@ -151,6 +151,7 @@ export {
   getDatasetQualityBreakdown,
   getDatasetQualityGrade,
   getDatasetQualityScore,
+  getDatasetsQualityStats,
   qualityScoreToGrade,
 } from "./utils/quality";
 export type {
@@ -158,6 +159,7 @@ export type {
   DatasetQualityComponent,
   DatasetQualityGrade,
   DatasetQualityRating,
+  DatasetQualityStats,
 } from "./utils/quality";
 export { getDatasetCompletenessScore } from "./utils/completeness";
 export type {
@@ -236,6 +238,7 @@ export { groupDatasetsByTag } from "./utils/groupByTag";
 export type { GroupDatasetsByTagOptions } from "./utils/groupByTag";
 export { groupDatasetsByYear } from "./utils/groupByYear";
 export type { GroupByYearOptions } from "./utils/groupByYear";
+export { groupDatasetsByOwner } from "./utils/groupByOwner";
 export {
   isVerifiedDataset,
   isPublicDataset,

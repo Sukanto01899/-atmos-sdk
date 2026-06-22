@@ -3,6 +3,7 @@ import {
   getDatasetQualityBreakdown,
   getDatasetQualityGrade,
   getDatasetQualityScore,
+  getDatasetsQualityStats,
   qualityScoreToGrade,
 } from "../src/utils/quality";
 import type { DatasetMetadata } from "../src/types";
@@ -141,6 +142,51 @@ describe("getDatasetQualityBreakdown", () => {
     expect(getDatasetQualityBreakdown(metadata).score).toBe(
       getDatasetQualityScore(metadata),
     );
+  });
+});
+
+describe("getDatasetsQualityStats", () => {
+  test("computes count, average, median (even-sized), min, and max", () => {
+    const stats = getDatasetsQualityStats([
+      baseMetadata(), // 0
+      { ...baseMetadata(), verified: true }, // 45
+      { ...baseMetadata(), verified: true, ipfsHash: "QmHash" }, // 75
+      {
+        ...baseMetadata(),
+        status: "verified",
+        ipfsHash: "QmHash",
+        metadataFrozen: true,
+        isPublic: true,
+      }, // 100
+    ]);
+
+    expect(stats).toEqual({ count: 4, average: 55, median: 60, min: 0, max: 100 });
+  });
+
+  test("computes the median as the middle score for odd-sized sets", () => {
+    const stats = getDatasetsQualityStats([
+      baseMetadata(), // 0
+      { ...baseMetadata(), verified: true }, // 45
+      {
+        ...baseMetadata(),
+        status: "verified",
+        ipfsHash: "QmHash",
+        metadataFrozen: true,
+        isPublic: true,
+      }, // 100
+    ]);
+
+    expect(stats?.median).toBe(45);
+    expect(stats?.average).toBeCloseTo(48.333, 2);
+  });
+
+  test("returns matching stats for a single dataset", () => {
+    const stats = getDatasetsQualityStats([{ ...baseMetadata(), verified: true }]);
+    expect(stats).toEqual({ count: 1, average: 45, median: 45, min: 45, max: 45 });
+  });
+
+  test("returns null for an empty array", () => {
+    expect(getDatasetsQualityStats([])).toBeNull();
   });
 });
 

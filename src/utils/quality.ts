@@ -120,3 +120,50 @@ export const getDatasetQualityGrade = (
   return { score, grade, label: GRADE_LABELS[grade] };
 };
 
+export interface DatasetQualityStats {
+  /** Number of datasets the stats were computed over. */
+  count: number;
+  /** Mean quality score across all datasets. */
+  average: number;
+  /** Median quality score across all datasets. */
+  median: number;
+  /** Lowest quality score in the set. */
+  min: number;
+  /** Highest quality score in the set. */
+  max: number;
+}
+
+/**
+ * Aggregate `getDatasetQualityScore` across a set of datasets — the quality
+ * equivalent of `getAltitudeRange`/`getDatasetsCentroid`, useful for
+ * dashboards, owner leaderboards, or collection-health summaries.
+ *
+ * Returns `null` for an empty array.
+ *
+ * @example
+ * const stats = getDatasetsQualityStats(ownerDatasets);
+ * if (stats) console.log(`avg ${stats.average}, median ${stats.median}`);
+ */
+export const getDatasetsQualityStats = (
+  datasets: DatasetMetadata[],
+): DatasetQualityStats | null => {
+  if (datasets.length === 0) return null;
+
+  const scores = datasets
+    .map((metadata) => getDatasetQualityScore(metadata))
+    .sort((a, b) => a - b);
+
+  const count = scores.length;
+  const sum = scores.reduce((total, score) => total + score, 0);
+  const mid = Math.floor(count / 2);
+  const median = count % 2 === 0 ? (scores[mid - 1] + scores[mid]) / 2 : scores[mid];
+
+  return {
+    count,
+    average: sum / count,
+    median,
+    min: scores[0],
+    max: scores[count - 1],
+  };
+};
+
