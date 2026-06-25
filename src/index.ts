@@ -238,6 +238,8 @@ export { normalizeTags } from "./utils/normalizeTags";
 export type { NormalizeTagsOptions } from "./utils/normalizeTags";
 export { groupDatasetsByTag } from "./utils/groupByTag";
 export type { GroupDatasetsByTagOptions } from "./utils/groupByTag";
+export { getRelatedTags } from "./utils/relatedTags";
+export type { RelatedTagEntry, RelatedTagsOptions } from "./utils/relatedTags";
 export { groupDatasetsByYear } from "./utils/groupByYear";
 export type { GroupByYearOptions } from "./utils/groupByYear";
 export { groupDatasetsByOwner } from "./utils/groupByOwner";
