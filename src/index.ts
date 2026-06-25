@@ -230,6 +230,8 @@ export { getRecentDatasets } from "./utils/recentDatasets";
 export type { RecentDatasetsOptions } from "./utils/recentDatasets";
 export { getStaleDatasets } from "./utils/staleDatasets";
 export type { StaleDatasetsOptions } from "./utils/staleDatasets";
+export { getDatasetFreshnessScore } from "./utils/freshness";
+export type { DatasetFreshnessOptions } from "./utils/freshness";
 export { filterByTag } from "./utils/filterByTag";
 export type { FilterByTagOptions } from "./utils/filterByTag";
 export { getUniqueTags } from "./utils/getUniqueTags";
