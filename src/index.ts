@@ -54,6 +54,11 @@ export type {
   DatasetDiffResult,
 } from "./types";
 export { diffDatasetMetadata } from "./utils/diff";
+export { diffDatasetCollections } from "./utils/diffCollections";
+export type {
+  DatasetCollectionDiff,
+  DatasetCollectionDiffEntry,
+} from "./utils/diffCollections";
 export { fromGeoJsonFeature, fromGeoJsonFeatureCollection } from "./utils/fromGeoJson";
 export type { FromGeoJsonOptions } from "./utils/fromGeoJson";
 export { clusterDatasets } from "./utils/cluster";
