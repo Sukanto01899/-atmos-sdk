@@ -222,6 +222,7 @@ export {
   getDatasetAltitudeBand,
 } from "./utils/altitudeBand";
 export type { AltitudeBand } from "./utils/altitudeBand";
+export { groupDatasetsByAltitudeBand } from "./utils/groupByAltitudeBand";
 export { getDatasetTimeExtent } from "./utils/timeExtent";
 export type { DatasetTimeExtent, DatasetTimeField } from "./utils/timeExtent";
 export { countByStatus } from "./utils/countByStatus";
